@@ -1,6 +1,6 @@
  <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
      <div class="app-brand demo">
-         <a href="{{route('dashboard')}}" class="app-brand-link">
+         <a href="{{ route('dashboard') }}" class="app-brand-link">
              <img src="{{ asset('assets/img/logo.png') }}" alt="" height="54px">
          </a>
 
@@ -16,7 +16,7 @@
              <span class="menu-header-text">Dashboard</span>
          </li>
          <li class="menu-item {{ $title == 'Dashboard Admin' ? 'active' : '' }}">
-             <a href="{{route('dashboard')}}" class="menu-link">
+             <a href="{{ route('dashboard') }}" class="menu-link">
                  <i class="menu-icon tf-icons bx bx-home-circle"></i>
                  <div data-i18n="Analytics">Dashboard</div>
              </a>
@@ -26,15 +26,30 @@
              <span class="menu-header-text">User</span>
          </li>
          <li class="menu-item {{ $title == 'Mahasiswa' ? 'active' : '' }}">
-             <a href="{{route('mahasiswa.index')}}" class="menu-link">
+             <a href="{{ route('mahasiswa.index') }}" class="menu-link">
                  <i class='menu-icon bx bx-group'></i>
                  <div data-i18n="Analytics">Data Mahasiswa</div>
              </a>
          </li>
-         <li class="menu-item {{ $title == 'Dosen Pembimbing Lapangan' ? 'active' : '' }}">
-             <a href="{{route('dosen-pembimbing-lapangan.index')}}" class="menu-link">
+         <li class="menu-item {{ $title == 'Pembimbing Lapangan' ? 'active' : '' }}">
+             <a href="{{ route('dosen-pembimbing-lapangan.index') }}" class="menu-link">
                  <i class='menu-icon bx bx-group'></i>
                  <div data-i18n="Analytics">Pemb Lapangan</div>
+             </a>
+         </li>
+         <li class="menu-item {{ $title == 'Dosen Pembimbing' ? 'active' : '' }}">
+             <a href="{{ route('dosen-pembimbing-lapangan.index') }}" class="menu-link">
+                 <i class='menu-icon bx bx-group'></i>
+                 <div data-i18n="Analytics">Dosen Pembimbing</div>
+             </a>
+         </li>
+         <li class="menu-header small text-uppercase">
+             <span class="menu-header-text">Lokasi PPL</span>
+         </li>
+         <li class="menu-item {{ $title == 'Tempat PPL' ? 'active' : '' }}">
+             <a href="{{route('lokasi.index')}}" class="menu-link">
+                 <i class='menu-icon bx bx-group'></i>
+                 <div data-i18n="Analytics">Tempat PPL</div>
              </a>
          </li>
      </ul>

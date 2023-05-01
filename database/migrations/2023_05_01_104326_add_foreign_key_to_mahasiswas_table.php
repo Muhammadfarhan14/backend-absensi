@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('datangs', function (Blueprint $table) {
-            $table->id();
-            $table->string('gambar')->nullable();
-            $table->timestamps();
+        Schema::table('mahasiswas', function (Blueprint $table) {
+            //
         });
     }
 
@@ -27,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('datangs');
+        Schema::table('mahasiswas', function (Blueprint $table) {
+            //
+        });
     }
 };

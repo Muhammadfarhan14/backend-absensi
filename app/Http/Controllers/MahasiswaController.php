@@ -17,7 +17,7 @@ class MahasiswaController extends Controller
     public function index()
     {
         $mhs = Mahasiswa::get();
-        return view('Admin.pages.mahasiswa.index',compact('mhs'));
+        return view('Admin.pages.mahasiswa.index', ['mhs' => $mhs]);
     }
 
 
@@ -66,15 +66,15 @@ class MahasiswaController extends Controller
             'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ]);
 
-        $mhs = Mahasiswa::where('id',$id)->first();
+        $mhs = Mahasiswa::where('id', $id)->first();
         $mhs->nama = $request->nama;
         $mhs->nim = $request->nim;
         $mhs->password = Hash::make($request->password);
         $mhs->tempat_ppl = $request->tempat_ppl;
         $mhs->dosen_pembimbing = $request->dosen_pembimbing;
 
-        if($request->gambar){
-            $file_path = public_path().'/images/'.$mhs->gambar;
+        if ($request->gambar) {
+            $file_path = public_path() . '/images/' . $mhs->gambar;
             unlink($file_path);
 
             $foto = $request->file('gambar');
@@ -90,7 +90,7 @@ class MahasiswaController extends Controller
                 'dosen_pembimbing' => $request->dosen_pembimbing,
                 'gambar' => $profileImage,
             ]);
-        }else{
+        } else {
             $mhs->update([
                 'nama' => $request->nama,
                 'nim' => $request->nim,
@@ -111,16 +111,19 @@ class MahasiswaController extends Controller
      */
     public function destroy($id)
     {
-        $mhs = Mahasiswa::where('id',$id)->first();
+        $mhs = Mahasiswa::where('id', $id)->first();
         $mhs->delete();
         return redirect()->route('mahasiswa.index');
     }
 
     public function show($id)
     {
-        $mahasiswa = Mahasiswa::where('id',$id)->first();
+        $mahasiswa = Mahasiswa::where('id', $id)->first();
         return response()->json([
-            ""
+            "message" => "kamu berhasil mengambil data",
+            "data" => [
+                $mahasiswa
+            ]
         ]);
     }
 }

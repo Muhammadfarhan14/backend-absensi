@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('pulangs', function (Blueprint $table) {
             $table->id();
+            $table->string('gambar')->nullable();
             $table->timestamps();
         });
     }

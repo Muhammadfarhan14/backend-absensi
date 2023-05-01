@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DosenPembimbingLapanganController;
+use App\Http\Controllers\MahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +19,11 @@ Route::get('/', function () {
     return view('Login.login');
 });
 
-Route::get('/dashboard', function () {
-    return view('Admin.Dashboard.index');
+
+Route::prefix('admin')->group( function(){
+    Route::get('/dashboard', function () {
+        return view('Admin.pages.dashboard.index');
+    })->name('dashboard');
+    Route::resource('mahasiswa',MahasiswaController::class)->except('create','edit','show');
+    Route::resource('dosen-pembimbing-lapangan',DosenPembimbingLapanganController::class)->except('create','edit','show');
 });

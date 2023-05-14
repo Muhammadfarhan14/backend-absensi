@@ -13,8 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('mahasiswas', function (Blueprint $table) {
-            $table->string('gambar')->nullable();
+        Schema::create('pembimbing_lapangan', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('nama');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('mahasiswas', function (Blueprint $table) {
-            $table->dropColumn('gambar');
-        });
+        Schema::dropIfExists('pembimbing_lapangan');
     }
 };

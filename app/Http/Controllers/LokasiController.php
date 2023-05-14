@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lokasi;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LokasiController extends Controller
 {
@@ -17,21 +18,20 @@ class LokasiController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'gambar' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ]);
-
-        $lokasi = new Lokasi();
-        $lokasi->nama = $request->nama;
-        $lokasi->alamat = $request->alamat;
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
         $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
-        $lokasi->gambar = $profileImage;
+        Lokasi::create([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'gambar' => $profileImage
+        ]);
 
-        $lokasi->save();
         return redirect()->route('lokasi.index');
     }
 

@@ -1,4 +1,4 @@
-@extends('Admin.Layouts.App', ['title' => 'Mahasiswa'])
+@extends('Admin.Layouts.App', ['title' => 'Pembimbing Lapangan'])
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -7,44 +7,33 @@
 @endpush
 
 @section('isi')
-
-@php
-use App\Models\DosenPembimbing;
-use App\Models\PembimbingLapangan;
-use App\Models\Lokasi;
-@endphp
-
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4">Mahasiswa</h4>
+        <h4 class="fw-bold py-3 mb-4">Pembimbing Lapangan</h4>
 
         <div class="card">
             <div class="card-header flex-column flex-md-row">
                 <div class="text-end pt-3 pt-md-0">
-                  @if(Lokasi::count() != null && PembimbingLapangan::count() != null && DosenPembimbing::count() != null)
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-mahasiswa">
-                    <span><i class="bx bx-plus me-sm-2"></i><span class="d-none d-sm-inline-block">Tambah
-                            Mahasiswa</span></span>
-                </button>
-                  @endif
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-pembimbing-lapangan">
+                        <span><i class="bx bx-plus me-sm-2"></i><span class="d-none d-sm-inline-block">Tambah
+                                Pembimbing Lapangan</span></span>
+                    </button>
                 </div>
                 <div class="card-datatable table-responsive mt-3">
-                    <table class="datatables-users table border-top" id="mahasiswa">
+                    <table class="datatables-users table border-top" id="pembimbing-lapangan">
                         <thead>
                             <tr>
                                 <th>No.</th>
                                 <th>Nama</th>
-                                <th>Nim</th>
-                                <th>Tempat PPL</th>
+                                <th>Username</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($mhs as $item)
+                            @foreach ($data as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->nama }}</td>
-                                <td>{{ $item->nim }}</td>
-                                <td>{{ $item->lokasi->nama }}</td>
+                                <td>{{ $item->pembimbing_lapangan->nama }}</td>
+                                <td>{{ $item->username }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal"
                                         data-bs-target="#edit-modal-{{ $item->id }}"><span><i
@@ -63,7 +52,7 @@ use App\Models\Lokasi;
                     </table>
                 </div>
             </div>
-            @include('Admin.pages.mahasiswa.modal')
+            @include('Admin.pages.pembimbing-lapangan.modal')
         </div>
     </div>
 @endsection
@@ -76,7 +65,7 @@ use App\Models\Lokasi;
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#mahasiswa').DataTable({
+            $('#pembimbing-lapangan').DataTable({
                 // Scroll options
                 scrollY: '300px',
                 scrollX: true,

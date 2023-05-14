@@ -34,7 +34,7 @@
     <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
     <script src="{{ asset('assets/js/config.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/datatables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.css') }}">w
 </head>
 
 <body>

@@ -15,11 +15,14 @@ return new class extends Migration
     {
         Schema::create('mahasiswas', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('nama');
-            $table->string('nim',11);
-            $table->string('password');
+            $table->string('nim');
+            $table->string('gambar')->nullable();
             $table->string('tempat_ppl');
             $table->string('dosen_pembimbing');
+            $table->string('pembimbing_lapangan');
             $table->timestamps();
         });
     }

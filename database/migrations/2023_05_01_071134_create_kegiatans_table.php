@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('mahasiswa_id')->nullable();
+            $table->foreign('mahasiswa_id')->references('id')->on('mahasiswas')->onDelete('cascade')->onUpdate('cascade');
             $table->string('deskripsi')->nullable();
             $table->timestamps();
         });

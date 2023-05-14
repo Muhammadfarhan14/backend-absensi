@@ -1,4 +1,4 @@
-@extends('Admin.Layouts.App', ['title' => 'Dosen Pembimbing Lapangan'])
+@extends('Admin.Layouts.App', ['title' => 'Dosen Pembimbing'])
 
 @push('style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -8,34 +8,32 @@
 
 @section('isi')
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4">Dosen Pembimbing Lapangan</h4>
+        <h4 class="fw-bold py-3 mb-4">Dosen Pembimbing</h4>
 
         <div class="card">
             <div class="card-header flex-column flex-md-row">
                 <div class="text-end pt-3 pt-md-0">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-mahasiswa">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-dosen-pembimbing">
                         <span><i class="bx bx-plus me-sm-2"></i><span class="d-none d-sm-inline-block">Tambah
-                                Dosen Pembimbing Lapangan</span></span>
+                                Dosen Pembimbing</span></span>
                     </button>
                 </div>
                 <div class="card-datatable table-responsive mt-3">
-                    <table class="datatables-users table border-top" id="mahasiswa">
+                    <table class="datatables-users table border-top" id="dosen-pembimbing">
                         <thead>
                             <tr>
                                 <th>No.</th>
                                 <th>Nama</th>
-                                <th>Nim</th>
-                                <th>Tempat PPL</th>
+                                <th>Nomor NIPD</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($dosen_pembimbing_lapangan as $item)
+                            @foreach ($data as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->nama }}</td>
-                                <td>{{ $item->nim }}</td>
-                                <td>{{ $item->tempat_ppl }}</td>
+                                <td>{{ $item->dosen_pembimbing->nama }}</td>
+                                <td>{{ $item->username }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal"
                                         data-bs-target="#edit-modal-{{ $item->id }}"><span><i
@@ -54,7 +52,7 @@
                     </table>
                 </div>
             </div>
-            @include('Admin.pages.dosen-pembimbing-lapangan.modal')
+            @include('Admin.pages.dosen-pembimbing.modal')
         </div>
     </div>
 @endsection

@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('dosen_pembimbing_lapangans', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('mahasiswas', function (Blueprint $table) {
+            $table->dropColumn('tempat_ppl');
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dosen_pembimbing_lapangans');
+        Schema::table('mahasiswas', function (Blueprint $table) {
+            //
+        });
     }
 };

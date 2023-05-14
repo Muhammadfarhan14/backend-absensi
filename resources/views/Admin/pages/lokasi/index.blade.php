@@ -19,7 +19,7 @@
                     </button>
                 </div>
                 <div class="card-datatable table-responsive mt-3">
-                    <table class="datatables-users table border-top" id="lokasi">
+                    <table class="datatables-users table border-top" id="mahasiswa">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -30,12 +30,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($mhs as $item)
+                            @foreach ($lokasi as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td><img src="{{asset('../images/'. $item->gambar)}}" width="150px" alt=""></td>
                                 <td>{{ $item->nama }}</td>
-                                <td>{{ $item->nim }}</td>
-                                <td>{{ $item->tempat_ppl }}</td>
+                                <td>{{ Str::limit($item->alamat,20) }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal"
                                         data-bs-target="#edit-modal-{{ $item->id }}"><span><i
@@ -49,7 +49,7 @@
                                     </button>
                                 </td>
                             </tr>
-                            @endforeach --}}
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -67,7 +67,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#lokasi').DataTable({
+            $('#mahasiswa').DataTable({
                 // Scroll options
                 scrollY: '300px',
                 scrollX: true,

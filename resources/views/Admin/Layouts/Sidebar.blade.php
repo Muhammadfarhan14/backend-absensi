@@ -32,13 +32,13 @@
              </a>
          </li>
          <li class="menu-item {{ $title == 'Pembimbing Lapangan' ? 'active' : '' }}">
-             <a href="{{ route('dosen-pembimbing-lapangan.index') }}" class="menu-link">
+             <a href="{{ route('pembimbing-lapangan.index') }}" class="menu-link">
                  <i class='menu-icon bx bx-group'></i>
                  <div data-i18n="Analytics">Pemb Lapangan</div>
              </a>
          </li>
          <li class="menu-item {{ $title == 'Dosen Pembimbing' ? 'active' : '' }}">
-             <a href="{{ route('dosen-pembimbing-lapangan.index') }}" class="menu-link">
+             <a href="{{ route('dosen-pembimbing.index') }}" class="menu-link">
                  <i class='menu-icon bx bx-group'></i>
                  <div data-i18n="Analytics">Dosen Pembimbing</div>
              </a>

@@ -24,9 +24,9 @@
                         </div>
                         <div class="row">
                             <div class="col mb-3">
-                                <label class="form-label">Masukan NIPD</label>
+                                <label class="form-label">Masukan Username</label>
                                 <input type="text" name="username" class="form-control"
-                                    placeholder="Masukkan NIPD Dosen Pembimbing" required>
+                                    placeholder="Masukkan Username Dosen Pembimbing" required>
                             </div>
                         </div>
                         <div class="row">
@@ -35,7 +35,7 @@
                                     <label class="form-label">Password</label>
                                     <div class="input-group input-group-merge">
                                         <input type="password" name="password" class="form-control"
-                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"/>
                                         <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
                                     </div>
                                 </div>
@@ -80,9 +80,9 @@
                             </div>
                             <div class="row">
                                 <div class="col mb-3">
-                                    <label class="form-label">Masukan NIPD</label>
+                                    <label class="form-label">Masukan Username</label>
                                     <input type="text" name="username" class="form-control"
-                                        placeholder="Masukkan NIPD Dosen Pembimbing" value="{{$point->username}}" required>
+                                        placeholder="Masukkan Username Dosen Pembimbing" value="{{$point->username}}" required>
                                 </div>
                             </div>
                             <div class="row">
@@ -91,7 +91,7 @@
                                         <label class="form-label">Password</label>
                                         <div class="input-group input-group-merge">
                                             <input type="password" name="password" class="form-control"
-                                                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" value="{{$point->password}}" />
+                                                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"/>
                                             <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
                                         </div>
                                     </div>

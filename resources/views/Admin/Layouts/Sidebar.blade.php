@@ -15,7 +15,7 @@
          <li class="menu-header small text-uppercase">
              <span class="menu-header-text">Dashboard</span>
          </li>
-         <li class="menu-item {{ $title == 'Dashboard Admin' ? 'active' : '' }}">
+         <li class="menu-item {{ $title == 'Dashboard' ? 'active' : '' }}">
              <a href="{{ route('dashboard') }}" class="menu-link">
                  <i class="menu-icon tf-icons bx bx-home-circle"></i>
                  <div data-i18n="Analytics">Dashboard</div>
@@ -48,7 +48,7 @@
          </li>
          <li class="menu-item {{ $title == 'Tempat PPL' ? 'active' : '' }}">
              <a href="{{route('lokasi.index')}}" class="menu-link">
-                 <i class='menu-icon bx bx-group'></i>
+                <i class='bx bx-current-location'></i>
                  <div data-i18n="Analytics">Tempat PPL</div>
              </a>
          </li>

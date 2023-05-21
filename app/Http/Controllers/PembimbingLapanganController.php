@@ -25,12 +25,13 @@ class PembimbingLapanganController extends Controller
         $user = new User();
 
         $user->username = $request->username;
+        $user->nama = $request->nama;
         $user->password = Hash::make($request->password);
         $user->roles = "pembimbing_lapangan";
         $user->save();
 
         $pembimbing_lapangan = new PembimbingLapangan();
-        $pembimbing_lapangan->nama = $request->nama;
+        $pembimbing_lapangan->nama = $user->nama;
         $pembimbing_lapangan->user_id = $user->id;
         $pembimbing_lapangan->save();
 
@@ -42,11 +43,12 @@ class PembimbingLapanganController extends Controller
         $user = User::where('id', $id)->first();
         $user->update([
             'username' => $request->username,
+            'nama' => $request->nama,
             'password' => $request->password,
         ]);
         $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
         $pembimbing_lapangan->update([
-            'nama' => $request->nama,
+            'nama' => $user->nama,
         ]);
 
         return redirect()->route('pembimbing-lapangan.index');

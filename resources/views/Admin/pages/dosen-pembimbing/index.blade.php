@@ -24,7 +24,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Nama</th>
-                                <th>Nomor NIPD</th>
+                                <th>Username</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>

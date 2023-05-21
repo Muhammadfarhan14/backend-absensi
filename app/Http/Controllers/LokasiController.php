@@ -40,7 +40,6 @@ class LokasiController extends Controller
         $lokasi = Lokasi::where('id',$id)->first();
 
         if($request->gambar){
-
             $file_path = public_path().'/images/'.$lokasi->gambar;
             unlink($file_path);
 

@@ -80,5 +80,6 @@ Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function
 Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('home',[DosenPembimbingController::class,'home']);
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
+    Route::get('detail_mahasiswa',[DosenPembimbingController::class,'detail_mahasiswa']);
 });
 #end dosen pembimbing

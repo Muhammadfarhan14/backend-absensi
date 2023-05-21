@@ -64,6 +64,7 @@ class MahasiswaController extends Controller
 
         $user = new User();
         $user->username = $mhs->nim;
+        $user->nama = $mhs->nama;
         $user->password = Hash::make($request->password);
         $user->roles = "mahasiswa";
         $user->save();
@@ -83,8 +84,8 @@ class MahasiswaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::where('id', $id)->first();
-        $mhs = Mahasiswa::where('user_id', $user->id)->first();
+        $mhs = Mahasiswa::where('id', $id)->first();
+        $user = User::where('id',$mhs->user_id)->where('roles','mahasiswa')->first();
 
         $this->validate($request, [
             'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
@@ -109,6 +110,7 @@ class MahasiswaController extends Controller
             ]);
             $user->update([
                 'username' => $mhs->nim,
+                'nama' => $mhs->nama,
                 'password' => Hash::make($request->password),
             ]);
 
@@ -122,6 +124,7 @@ class MahasiswaController extends Controller
             ]);
             $user->update([
                 'username' => $mhs->nim,
+                'nama' => $mhs->nama,
                 'password' => Hash::make($request->password),
             ]);
         }
@@ -137,8 +140,8 @@ class MahasiswaController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::where('id',$id)->first();
-        $mhs = Mahasiswa::where('user_id', $user->id)->first();
+        $mhs = Mahasiswa::where('id', $id)->first();
+        $user = User::where('id', $mhs->user_id)->first();
         $file_path = public_path() . '/images/' . $mhs->gambar;
         unlink($file_path);
         $mhs->delete();
@@ -152,7 +155,7 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::with('datang','kegiatan','kendala','pulang')->where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::with('datang', 'kegiatan', 'kendala', 'pulang')->where('user_id', $user->id)->first();
             return response()->json([
                 "message" => "kamu berhasil mengambil data",
                 "data" => [
@@ -170,7 +173,7 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             $mhs = Datang::create([
                 'mahasiswa_id' => $mahasiswa->id
             ]);
@@ -197,7 +200,7 @@ class MahasiswaController extends Controller
                 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
             ]);
 
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
             if ($request->gambar) {
                 $foto = $request->file('gambar');
@@ -227,14 +230,15 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
-            for ($i = 0; $i < count($request->all()); $i++) {
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
                 Kegiatan::create([
                     'deskripsi' => $request->deskripsi,
+                    'jam_mulai' => $request->jam_mulai,
+                    'jam_selesai' => $request->jam_selesai,
                     'mahasiswa_id' => $mahasiswa->id
                 ]);
-            }
+
 
             return response()->json([
                 "message" => "kamu berhasil membuat deskripsi kegiatan",
@@ -252,7 +256,7 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             Kendala::create([
                 'deskripsi' => $request->deskripsi,
                 'mahasiswa_id' => $mahasiswa->id
@@ -275,7 +279,7 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             Pulang::create([
                 'mahasiswa_id' => $mahasiswa->id
             ]);
@@ -300,7 +304,7 @@ class MahasiswaController extends Controller
                 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
             ]);
 
-            $mahasiswa = Mahasiswa::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
 
             if ($request->gambar) {

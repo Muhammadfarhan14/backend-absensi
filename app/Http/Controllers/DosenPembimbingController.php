@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kendala;
 use App\Models\User;
 use App\Models\Datang;
 use App\Models\Lokasi;
@@ -26,6 +27,7 @@ class DosenPembimbingController extends Controller
         $user = new User();
 
         $user->username = $request->username;
+        $user->nama = $request->nama;
         $user->password = Hash::make($request->password);
         $user->roles = "dosen_pembimbing";
         $user->save();
@@ -40,7 +42,7 @@ class DosenPembimbingController extends Controller
         $foto->move($destinationPath, $profileImage);
 
         $dosen_pembimbing = new DosenPembimbing();
-        $dosen_pembimbing->nama = $request->nama;
+        $dosen_pembimbing->nama = $user->nama;
         $dosen_pembimbing->user_id = $user->id;
         $dosen_pembimbing->gambar = $profileImage;
         $dosen_pembimbing->save();
@@ -64,21 +66,23 @@ class DosenPembimbingController extends Controller
 
             $user->update([
                 'username' => $request->username,
+                'nama' => $request->nama,
                 'password' => $request->password,
             ]);
 
             $dosen_pembimbing->update([
-                'nama' => $request->nama,
+                'nama' => $user->nama,
                 'gambar' => $profileImage
             ]);
 
         } else {
             $user->update([
                 'username' => $request->username,
+                'nama' => $request->nama,
                 'password' => $request->password,
             ]);
             $dosen_pembimbing->update([
-                'nama' => $request->nama,
+                'nama' => $user->nama,
             ]);
 
         }
@@ -103,7 +107,12 @@ class DosenPembimbingController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
-            $lokasi_ppl = Lokasi::get();
+            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id',$dosen_pembimbing->id)->get();
+            $lokasi_ppl = [];
+            foreach ($mahasiswa as $key => $value) {
+                $lokasi_ppl[$key] = Lokasi::where('id', $value->lokasi_id)->first();
+            }
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data pembimbing lapangan dan lokasi PPL",
@@ -112,7 +121,10 @@ class DosenPembimbingController extends Controller
                   "dosen pembimbing" => $user
                 ],
                 [
-                   "lokasi" => $lokasi_ppl
+                   "lokasi" => $lokasi_ppl,
+                ],
+                [
+                    "mahasiswa" => $mahasiswa
                 ]
             ]);
         }
@@ -144,6 +156,44 @@ class DosenPembimbingController extends Controller
             ]);
         }
     }
+
+    public function detail_mahasiswa()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::with('kegiatan')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+
+            return response()->json([
+                "message" => "kamu berhasil mengirim data mahasiswa",
+                "data" =>[
+                   "mahasiswa" => $mahasiswa,
+                ],
+            ]);
+        }
+    }
+
+    public function update_kendala()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
+            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+            $kendala = Kendala::where('status', false)->first();
+            $kendala->update([
+                'status' => true
+            ]);
+
+            return response()->json([
+                "message" => "kamu berhasil mengirim data mahasiswa",
+                "data" =>[
+                   "mahasiswa" => $mahasiswa,
+                ],
+            ]);
+        }
+    }
+
+
 #end dosen pembimbing
 
 }

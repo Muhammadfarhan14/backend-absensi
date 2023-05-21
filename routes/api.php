@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // kegiatan
     Route::prefix('kegiatan')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'kegiatan_action'])->name('kegiantan.create');
+        Route::post('create', [MahasiswaController::class, 'check_mahasiswa'])->name('kegiantan.create');
     });
 
     // kendala
@@ -81,5 +81,6 @@ Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('home',[DosenPembimbingController::class,'home']);
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
     Route::get('detail_mahasiswa',[DosenPembimbingController::class,'detail_mahasiswa']);
+    Route::get('update_kendala',[DosenPembimbingController::class,'update_kendala']);
 });
 #end dosen pembimbing

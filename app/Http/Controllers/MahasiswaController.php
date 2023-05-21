@@ -225,33 +225,6 @@ class MahasiswaController extends Controller
         ]);
     }
 
-    // kegiatan
-    public function kegiatan_action(Request $request)
-    {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-
-                Kegiatan::create([
-                    'deskripsi' => $request->deskripsi,
-                    'jam_mulai' => $request->jam_mulai,
-                    'jam_selesai' => $request->jam_selesai,
-                    'mahasiswa_id' => $mahasiswa->id
-                ]);
-
-
-            return response()->json([
-                "message" => "kamu berhasil membuat deskripsi kegiatan",
-                "data" => [
-                    Kegiatan::where('mahasiswa_id', $mahasiswa->id)->get()
-                ]
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
-    }
-
     public function kendala_action(Request $request)
     {
         $user = Auth::user();
@@ -327,5 +300,29 @@ class MahasiswaController extends Controller
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
+    }
+
+    // kegiatan
+    public function check_mahasiswa(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+
+            $mahasiswa = Mahasiswa::where('nim',$request->nim)->first();
+
+            Kegiatan::create([
+                'deskripsi' => $request->deskripsi,
+                'jam_mulai' => $request->jam_mulai,
+                'jam_selesai' => $request->jam_selesai,
+                'mahasiswa_id' => $mahasiswa->id
+            ]);
+
+            return response()->json([
+                "message" => "kamu berhasil membuat data kegiatan",
+                "data" => [
+                    Kegiatan::where('mahasiswa_id', $mahasiswa->id)->get()
+                ]
+            ]);
+        }
     }
 }

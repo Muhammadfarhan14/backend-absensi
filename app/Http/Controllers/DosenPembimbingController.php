@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kegiatan;
 use App\Models\Kendala;
 use App\Models\User;
 use App\Models\Datang;
@@ -162,13 +163,20 @@ class DosenPembimbingController extends Controller
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
-            $mahasiswa = Mahasiswa::with('kegiatan')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+            $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+            $jam_mulai = Kegiatan::where('mahasiswa_id',$mahasiswa->id)->first();
+            $jam_selesai = Kegiatan::where('mahasiswa_id',$mahasiswa->id)->latest()->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" =>[
                    "mahasiswa" => $mahasiswa,
                 ],
+                [
+                    "waktu kegiatan" =>
+                    $jam_mulai->jam_mulai,
+                    $jam_selesai->jam_selesai,
+                ]
             ]);
         }
     }

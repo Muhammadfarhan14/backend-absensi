@@ -23,7 +23,7 @@ Route::get('/', function () {
 })->name('login.web');
 
 
-Route::prefix('admin')->group( function(){
+Route::prefix('admin')->middleware('auth:sanctum')->group( function(){
     Route::get('/dashboard', function () {
         return view('Admin.pages.dashboard.index');
     })->name('dashboard');

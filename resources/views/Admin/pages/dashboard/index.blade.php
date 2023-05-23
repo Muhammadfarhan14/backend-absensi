@@ -15,7 +15,7 @@
                         <div class="col-sm-7">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Selamat Datang,</h5>
-                                <h3 class="card-title text-primary">Ahmad Ilham</h3>
+                                <h3 class="card-title text-primary">{{Auth::user()->nama}}</h3>
                             </div>
                         </div>
                         <div class="col-sm-5 text-center text-sm-left">

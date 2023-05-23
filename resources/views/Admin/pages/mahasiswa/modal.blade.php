@@ -12,21 +12,39 @@
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Foto Mahasiswa</label>
-                                <input type="file" name="gambar" class="form-control" required>
+                                <input type="file" name="gambar" class="form-control @error('gambar') is-invalid @enderror" required>
+                                @error('gambar')
+                                <div class="invalid-feedback">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Nama Mahasiswa</label>
-                                <input type="text" name="nama" class="form-control"
+                                <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
                                     placeholder="Masukkan Nama Mahasiswa" required>
+                                    @error('nama')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Nim</label>
-                                <input type="text" name="nim" class="form-control" placeholder="Masukkan Nim"
+                                <input type="text" name="nim" class="form-control @error('nim') is-invalid @enderror" placeholder="Masukkan Nim"
                                     required>
+                                    @error('nim')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
@@ -34,9 +52,15 @@
                                 <div class="form-password-toggle">
                                     <label class="form-label">Password</label>
                                     <div class="input-group input-group-merge">
-                                        <input type="password" name="password" class="form-control"
+                                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
                                             placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                         <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                        @error('password')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle-fill"></i>
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     </div>
                                 </div>
                             </div>
@@ -44,7 +68,7 @@
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Tempat PPL</label>
-                                <select class="form-select" name="lokasi_id">
+                                <select class="form-select @error('lokasi_id') is-invalid @enderror" name="lokasi_id" required>
                                     @if ($lokasi->count() != null)
                                     @foreach ($lokasi as $item)
                                     <option value="{{$item->id}}">{{$item->nama}}</option>
@@ -53,12 +77,18 @@
                                     <option selected disabled>Data Kosong!</option>
                                     @endif
                                   </select>
+                                  @error('lokasi_id')
+                                  <div class="invalid-feedback">
+                                      <i class="bi bi-exclamation-circle-fill"></i>
+                                      {{ $message }}
+                                  </div>
+                              @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Dosen Pembimbing</label>
-                                <select class="form-select" name="dosen_pembimbing_id">
+                                <select class="form-select @error('dosen_pembimbing_id') is-invalid @enderror" name="dosen_pembimbing_id" required>
                                     @if ($dosen_pembimbing->count() != null)
                                     @foreach ($dosen_pembimbing as $item)
                                     <option value="{{$item->id}}">{{$item->nama}}</option>
@@ -67,12 +97,18 @@
                                     <option selected disabled>Data Kosong!</option>
                                     @endif
                                   </select>
+                                  @error('dosen_pembimbing_id')
+                                  <div class="invalid-feedback">
+                                      <i class="bi bi-exclamation-circle-fill"></i>
+                                      {{ $message }}
+                                  </div>
+                              @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Pembimbing Lapangan</label>
-                                <select class="form-select" name="pembimbing_lapangan_id">
+                                <select class="form-select @error('pembimbing_lapangan_id') is-invalid @enderror" name="pembimbing_lapangan_id" required>
                                     @if ($pembimbing_lapangan->count() != null)
                                     @foreach ($pembimbing_lapangan as $item)
                                     <option value="{{$item->id}}">{{$item->nama}}</option>
@@ -81,6 +117,12 @@
                                     <option selected disabled>Data Kosong!</option>
                                     @endif
                                   </select>
+                                  @error('pembimbing_lapangan_id')
+                                  <div class="invalid-feedback">
+                                      <i class="bi bi-exclamation-circle-fill"></i>
+                                      {{ $message }}
+                                  </div>
+                              @enderror
                             </div>
                         </div>
                     </div>
@@ -110,21 +152,39 @@
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Foto Mahasiswa</label>
-                                        <input type="file" name="gambar" class="form-control" value="{{$point->gambar}}" >
+                                        <input type="file" name="gambar" class="form-control @error('gambar') is-invalid @enderror" value="{{$point->gambar}}">
+                                        @error('gambar')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle-fill"></i>
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Nama Mahasiswa</label>
-                                        <input type="text" name="nama" class="form-control"
+                                        <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
                                           placeholder="Masukan Nama Mahasiswa"  value="{{$point->nama}}" required>
+                                          @error('nama')
+                                          <div class="invalid-feedback">
+                                              <i class="bi bi-exclamation-circle-fill"></i>
+                                              {{ $message }}
+                                          </div>
+                                      @enderror
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Nim</label>
-                                        <input type="text" name="nim" class="form-control" placeholder="Masukkan Nim Mahasiswa"
+                                        <input type="text" name="nim" class="form-control @error('nim') is-invalid @enderror" placeholder="Masukkan Nim Mahasiswa"
                                         value="{{$point->nim}}" required>
+                                        @error('nim')
+                                        <div class="invalid-feedback">
+                                            <i class="bi bi-exclamation-circle-fill"></i>
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     </div>
                                 </div>
                                 <div class="row">
@@ -132,10 +192,16 @@
                                         <div class="form-password-toggle">
                                             <label class="form-label">Password</label>
                                             <div class="input-group input-group-merge">
-                                                <input type="password" name="password" class="form-control"
+                                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
                                                     placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"/>
                                                 <span class="input-group-text cursor-pointer"><i
                                                         class="bx bx-hide"></i></span>
+                                                        @error('password')
+                                                        <div class="invalid-feedback">
+                                                            <i class="bi bi-exclamation-circle-fill"></i>
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -143,7 +209,7 @@
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Tempat PPL</label>
-                                        <select class="form-select" name="lokasi_id">
+                                        <select class="form-select @error('lokasi_id') is-invalid @enderror" name="lokasi_id" required>
                                             @if ($point->lokasi_id != null)
                                             <option value="{{$point->lokasi->id}}" selected>{{$point->lokasi->nama}}</option>
                                             @if ($lokasi->count() != null)
@@ -158,12 +224,18 @@
                                             <option selected disabled>Data Kosong!</option>
                                             @endif
                                           </select>
+                                          @error('lokasi_id')
+                                          <div class="invalid-feedback">
+                                              <i class="bi bi-exclamation-circle-fill"></i>
+                                              {{ $message }}
+                                          </div>
+                                      @enderror
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Dosen Pembimbing</label>
-                                        <select class="form-select" name="dosen_pembimbing">
+                                        <select class="form-select @error('dosen_pembimbing_id') is-invalid @enderror" name="dosen_pembimbing_id" required>
                                             @if ($point->dosen_pembimbing != null)
                                             <option value="{{$point->dosen_pembimbing->id}}" selected>{{$point->dosen_pembimbing->nama}}</option>
                                             @if ($dosen_pembimbing->count() != null)
@@ -178,6 +250,35 @@
                                             <option selected disabled>Data Kosong!</option>
                                             @endif
                                           </select>
+                                          @error('dosen_pembimbing_id')
+                                          <div class="invalid-feedback">
+                                              <i class="bi bi-exclamation-circle-fill"></i>
+                                              {{ $message }}
+                                          </div>
+                                      @enderror
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label class="form-label">Pembimbing Lapangan</label>
+                                        <select class="form-select @error('pembimbing_lapangan_id') is-invalid @enderror" name="pembimbing_lapangan_id" required>
+                                            @if ($point->pembimbing_lapangan != null)
+                                            <option value="{{$point->pembimbing_lapangan->id}}" selected>{{$point->pembimbing_lapangan->nama}}</option>
+                                            @endif
+                                            @if ($pembimbing_lapangan->count() != null)
+                                            @foreach ($pembimbing_lapangan as $item)
+                                            <option value="{{$item->id}}">{{$item->nama}}</option>
+                                            @endforeach
+                                            @else
+                                            <option selected disabled>Data Kosong!</option>
+                                            @endif
+                                          </select>
+                                          @error('pembimbing_lapangan_id')
+                                          <div class="invalid-feedback">
+                                              <i class="bi bi-exclamation-circle-fill"></i>
+                                              {{ $message }}
+                                          </div>
+                                      @enderror
                                     </div>
                                 </div>
                             </div>

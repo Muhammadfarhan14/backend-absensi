@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LokasiRequest;
+use App\Http\Requests\UpdateLokasiRequest;
 use App\Models\Lokasi;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -15,11 +17,8 @@ class LokasiController extends Controller
         return view('Admin.pages.lokasi.index',['lokasi' => $lokasi]);
     }
 
-    public function store(Request $request)
+    public function store(LokasiRequest $request)
     {
-        $this->validate($request, [
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        ]);
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
@@ -35,7 +34,7 @@ class LokasiController extends Controller
         return redirect()->route('lokasi.index');
     }
 
-    public function update(Request $request,$id)
+    public function update(UpdateLokasiRequest $request,$id)
     {
         $lokasi = Lokasi::where('id',$id)->first();
 

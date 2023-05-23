@@ -12,15 +12,29 @@
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Nama Pembimbing Lapangan</label>
-                                <input type="text" name="nama" class="form-control"
+                                <input type="text" name="nama"
+                                    class="form-control @error('nama') is-invalid @enderror"
                                     placeholder="Masukkan Nama Pembimbing Lapangan" required>
+                                @error('nama')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Username</label>
-                                <input type="text" name="username" class="form-control" placeholder="Masukkan Username"
-                                    required>
+                                <input type="text" name="username"
+                                    class="form-control @error('username') is-invalid @enderror"
+                                    placeholder="Masukkan Username" required>
+                                @error('username')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
@@ -28,9 +42,16 @@
                                 <div class="form-password-toggle">
                                     <label class="form-label">Password</label>
                                     <div class="input-group input-group-merge">
-                                        <input type="password" name="password" class="form-control"
-                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                        <input type="password" name="password"
+                                            class="form-control @error('password') is-invalid @enderror"
+                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required/>
                                         <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                        @error('password')
+                                            <div class="invalid-feedback">
+                                                <i class="bi bi-exclamation-circle-fill"></i>
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -62,15 +83,29 @@
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Nama Pembimbing Lapangan</label>
-                                        <input type="text" name="nama" class="form-control"
-                                          placeholder="Masukan Nama Pembimbing Lapangan"  value="{{$point->pembimbing_lapangan->nama}}" required>
+                                        <input type="text" name="nama"
+                                            class="form-control @error('nama') is-invalid @enderror"
+                                            placeholder="Masukan Nama Pembimbing Lapangan"
+                                            value="{{ $point->pembimbing_lapangan->nama }}" required>
+                                        @error('nama')
+                                            <div class="invalid-feedback">
+                                                <i class="bi bi-exclamation-circle-fill"></i>
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label class="form-label">Username</label>
-                                        <input type="text" name="username" class="form-control" placeholder="Masukkan username"
-                                        value="{{$point->username}}" required>
+                                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror"
+                                            placeholder="Masukkan username" value="{{ $point->username }}" required>
+                                            @error('username')
+                                            <div class="invalid-feedback">
+                                                <i class="bi bi-exclamation-circle-fill"></i>
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="row">
@@ -78,10 +113,17 @@
                                         <div class="form-password-toggle">
                                             <label class="form-label">Password</label>
                                             <div class="input-group input-group-merge">
-                                                <input type="password" name="password" class="form-control"
-                                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" value="{{$point->password}}" />
+                                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+                                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                                    value="{{ $point->password }}" />
                                                 <span class="input-group-text cursor-pointer"><i
                                                         class="bx bx-hide"></i></span>
+                                                        @error('password')
+                                                        <div class="invalid-feedback">
+                                                            <i class="bi bi-exclamation-circle-fill"></i>
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +154,8 @@
                             @csrf
                             <input type="hidden" name="id" id="id" value="{{ $point->id }}">
                             <div class="modal-body">
-                                Anda yakin ingin menghapus Pembimbing Lapangan <b>{{ $point->pembimbing_lapangan->nama }}</b>
+                                Anda yakin ingin menghapus Pembimbing Lapangan
+                                <b>{{ $point->pembimbing_lapangan->nama }}</b>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">

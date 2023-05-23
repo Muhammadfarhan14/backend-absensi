@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MahasiswaRequest;
+use App\Http\Requests\UpdateMahasiswaRequest;
 use App\Models\User;
 use App\Models\Datang;
 use App\Models\Lokasi;
@@ -41,12 +43,8 @@ class MahasiswaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(MahasiswaRequest $request)
     {
-
-        $this->validate($request, [
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        ]);
 
         $mhs = new Mahasiswa();
         $mhs->nama = $request->nama;
@@ -82,14 +80,10 @@ class MahasiswaController extends Controller
      * @param  \App\Models\Mahasiswa  $mahasiswa
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateMahasiswaRequest $request, $id)
     {
         $mhs = Mahasiswa::where('id', $id)->first();
         $user = User::where('id',$mhs->user_id)->where('roles','mahasiswa')->first();
-
-        $this->validate($request, [
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        ]);
 
         if ($request->gambar) {
             $file_path = public_path() . '/images/' . $mhs->gambar;

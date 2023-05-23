@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DosenPembimbingRequest;
+use App\Http\Requests\UpdateDosenPembimbingRequest;
 use App\Models\Kegiatan;
 use App\Models\Kendala;
 use App\Models\User;
@@ -23,7 +25,7 @@ class DosenPembimbingController extends Controller
         return view('Admin.pages.dosen-pembimbing.index', ['data' => $dosen_pembimbing]);
     }
 
-    public function store(Request $request)
+    public function store(DosenPembimbingRequest $request)
     {
         $user = new User();
 
@@ -32,10 +34,6 @@ class DosenPembimbingController extends Controller
         $user->password = Hash::make($request->password);
         $user->roles = "dosen_pembimbing";
         $user->save();
-
-        $this->validate($request, [
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        ]);
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
@@ -51,7 +49,7 @@ class DosenPembimbingController extends Controller
         return redirect()->route('dosen-pembimbing.index');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateDosenPembimbingRequest $request, $id)
     {
         $user = User::where('id',$id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();

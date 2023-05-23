@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PembimbingLapanganRequest;
 use App\Models\User;
 use App\Models\Datang;
 use App\Models\Lokasi;
@@ -20,7 +21,7 @@ class PembimbingLapanganController extends Controller
         return view('Admin.pages.pembimbing-lapangan.index', ['data' => $pembimbing_lapangan]);
     }
 
-    public function store(Request $request)
+    public function store(PembimbingLapanganRequest $request)
     {
         $user = new User();
 
@@ -38,7 +39,7 @@ class PembimbingLapanganController extends Controller
         return redirect()->route('pembimbing-lapangan.index');
     }
 
-    public function update(Request $request, $id)
+    public function update(PembimbingLapanganRequest $request, $id)
     {
         $user = User::where('id', $id)->first();
         $user->update([

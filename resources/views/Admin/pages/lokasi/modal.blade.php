@@ -12,21 +12,39 @@
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Foto Perusahaan</label>
-                                <input type="file" name="gambar" class="form-control" required>
+                                <input type="file" name="gambar" class="form-control @error('gambar') is-invalid @enderror" required>
+                                @error('gambar')
+                                <div class="invalid-feedback">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Nama</label>
-                                <input type="text" name="nama" class="form-control"
+                                <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
                                     placeholder="Masukkan Nama Perusahaan" required>
+                                    @error('nama')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="form-label">Alamat</label>
-                                <input type="text" name="alamat" class="form-control" placeholder="Masukkan Alamat Perusahaan"
+                                <input type="text" name="alamat" class="form-control @error('alamat') is-invalid @enderror" placeholder="Masukkan Alamat Perusahaan"
                                     required>
+                                    @error('alamat')
+                                    <div class="invalid-feedback">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
                     </div>

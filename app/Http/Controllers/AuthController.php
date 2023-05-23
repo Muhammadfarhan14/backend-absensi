@@ -23,8 +23,9 @@ class AuthController extends Controller
 
     public function logout_web(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
+        $request->session()->flush();
+        Auth::user()->tokens()->delete();
+        Auth::logout();
         return redirect()->route('login.web');
     }
     #endlogout
@@ -32,20 +33,16 @@ class AuthController extends Controller
     #auth admin web
     public function login(Request $request)
     {
-        $request->validate([
+       $krendensil = $request->validate([
             'username' => 'required',
             'password' => 'required'
         ]);
 
         $user = User::where('username', $request->username)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'username' => ['Kredensial yang diberikan salah'],
-            ]);
-        }
         $user->createToken($user->username)->plainTextToken;
-
+        Auth::attempt($krendensil);
+        Auth::user();
         return redirect()->route('dashboard');
     }
     #end auth admin web

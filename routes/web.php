@@ -21,9 +21,10 @@ use App\Http\Controllers\PembimbingLapanganController;
 Route::get('/', function () {
     return view('Login.login');
 })->name('login.web');
+Route::post('/', [AuthController::class,'login'])->name('login');
 
 
-Route::prefix('admin')->middleware('auth:sanctum')->group( function(){
+Route::prefix('admin')->middleware('auth')->group( function(){
     Route::get('/dashboard', function () {
         return view('Admin.pages.dashboard.index');
     })->name('dashboard');

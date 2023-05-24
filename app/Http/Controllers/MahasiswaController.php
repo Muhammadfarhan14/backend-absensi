@@ -162,6 +162,19 @@ class MahasiswaController extends Controller
         ]);
     }
 
+    public function datang_check_mahasiswa(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $mahasiswa = Mahasiswa::where('nim',$request->nim)->first();
+            return response()->json([
+                "message" => "kamu berhasil datang",
+                "data" => [
+                    $mahasiswa
+                ]
+            ]);
+    }
+    }
     // datang
     public function datang_action()
     {

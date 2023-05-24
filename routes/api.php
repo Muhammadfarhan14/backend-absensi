@@ -39,13 +39,14 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // datang
     Route::prefix('datang')->group(function () {
+        Route::post('check-mahasiswa',[MahasiswaController::class,'datang_check_mahasiswa']);
         Route::post('create', [MahasiswaController::class, 'datang_action'])->name('datang.create');
         Route::post('create-foto', [MahasiswaController::class, 'datang_action_2'])->name('datang.update');
     });
 
     // kegiatan
     Route::prefix('kegiatan')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'check_mahasiswa'])->name('kegiantan.create');
+        Route::post('create', [MahasiswaController::class, 'check_mahasiswa'])->name('kegiatan.create');
     });
 
     // kendala

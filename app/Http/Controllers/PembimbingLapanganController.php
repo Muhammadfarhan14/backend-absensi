@@ -70,14 +70,14 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id',$user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang','pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
-            $mhs = Mahasiswa::with('datang','pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::with('datang', 'pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
+            $mhs = Mahasiswa::with('datang', 'pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" =>[
-                   "mahasiswa" => $mahasiswa,
+                "data" => [
+                    "mahasiswa" => $mahasiswa,
                 ],
                 [
                     "lokasi" =>  $mhs->lokasi,
@@ -89,12 +89,10 @@ class PembimbingLapanganController extends Controller
                     "dosen pembimbing" =>   $mhs->dosen_pembimbing->nama,
                 ]
             ]);
-
         }
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
-
     }
 
     public function check_presensi_datang(Request $request)
@@ -102,30 +100,35 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $mahasiswa = Mahasiswa::with('datang')->where('nim', $request->nim)->first();
-            return response()->json([
-                "message" => "kamu berhasil mengirim detail data mahasiswa",
-                "data" => $mahasiswa
-            ]);
+            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
+            if ($mahasiswa && $datang) {
+                return response()->json([
+                    "message" => "kamu berhasil mengirim detail data mahasiswa",
+                    "data" => $mahasiswa
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "mahasiswa atau datang salah",
+                ]);
+            }
         }
 
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
-
     }
 
     public function check_mahasiswa_datang()
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id',$user->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" => $mahasiswa
             ]);
-
         }
         return response()->json([
             "message" => "kamu gagal mengirim data"
@@ -136,7 +139,7 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id',$user->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
             $hadir = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
             $hadir->update([
@@ -160,12 +163,18 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $mahasiswa = Mahasiswa::with('pulang')->where('nim', $request->nim)->first();
-            return response()->json([
-                "message" => "kamu berhasil mengirim detail data mahasiswa",
-                "data" => $mahasiswa
-            ]);
+            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
+            if ($mahasiswa && $pulang) {
+                return response()->json([
+                    "message" => "kamu berhasil mengirim detail data mahasiswa",
+                    "data" => $mahasiswa
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "mahasiswa atau datang salah",
+                ]);
+            }
         }
-
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
@@ -175,14 +184,13 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id',$user->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" => $mahasiswa
             ]);
-
         }
         return response()->json([
             "message" => "kamu gagal mengirim data"
@@ -193,7 +201,7 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id',$user->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
             $hadir = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
             $hadir->update([
@@ -211,5 +219,5 @@ class PembimbingLapanganController extends Controller
             "message" => "kamu gagal mengirim data"
         ]);
     }
-#end api pembimbing lapangan
+    #end api pembimbing lapangan
 }

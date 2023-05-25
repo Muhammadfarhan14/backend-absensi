@@ -174,6 +174,9 @@ class MahasiswaController extends Controller
                 ]
             ]);
     }
+    return response()->json([
+        "message" => "kamu gagal mengirim data"
+    ]);
     }
     // datang
     public function datang_action()
@@ -249,7 +252,6 @@ class MahasiswaController extends Controller
                 ]
             ]);
         }
-
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
@@ -331,5 +333,8 @@ class MahasiswaController extends Controller
                 ]
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
     }
 }

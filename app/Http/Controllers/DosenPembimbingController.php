@@ -127,6 +127,9 @@ class DosenPembimbingController extends Controller
                 ]
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
 
     }
 
@@ -154,6 +157,9 @@ class DosenPembimbingController extends Controller
                 ]
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
     }
 
     public function detail_mahasiswa()
@@ -177,6 +183,9 @@ class DosenPembimbingController extends Controller
                 ]
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
     }
 
     public function update_kendala()
@@ -197,6 +206,9 @@ class DosenPembimbingController extends Controller
                 ],
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
     }
 
 

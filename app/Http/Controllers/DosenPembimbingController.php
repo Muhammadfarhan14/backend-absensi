@@ -211,6 +211,11 @@ class DosenPembimbingController extends Controller
         ]);
     }
 
+    public function table_kegiatan()
+    {
+        
+    }
+
 
 #end dosen pembimbing
 

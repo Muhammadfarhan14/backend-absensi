@@ -99,16 +99,16 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $mahasiswa = Mahasiswa::with('datang')->where('nim', $request->nim)->first();
-            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
-            if ($mahasiswa && $datang) {
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            if ($mahasiswa) {
                 return response()->json([
-                    "message" => "kamu berhasil mengirim detail data mahasiswa",
+                    "message" => "kamu berhasil presensi datang",
                     "data" => $mahasiswa
                 ]);
             } else {
                 return response()->json([
-                    "message" => "mahasiswa atau datang salah",
+                    "message" => "nim kamu tidak terdaftar pada pembimbing lapangan ini"
                 ]);
             }
         }
@@ -118,15 +118,15 @@ class PembimbingLapanganController extends Controller
         ]);
     }
 
-    public function check_mahasiswa_datang()
+    public function check_mahasiswa_datang(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
 
             return response()->json([
-                "message" => "kamu berhasil mengirim data mahasiswa",
+                "message" => "kamu berhasil cek data mahasiswa",
                 "data" => $mahasiswa
             ]);
         }
@@ -135,21 +135,19 @@ class PembimbingLapanganController extends Controller
         ]);
     }
 
-    public function konfirmasi_presensi_datang()
+    public function konfirmasi_presensi_datang(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
-            $hadir = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
-            $hadir->update([
-                "keterangan" => "hadir"
+            $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            Datang::create([
+                'mahasiswa_id' => $mahasiswa->id
             ]);
-
             return response()->json([
-                "message" => "kamu berhasil mengirim data presensi datang",
+                "message" => "kamu berhasil membuat data datang",
                 "data" => [
-                    $mahasiswa
+                    Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
                 ]
             ]);
         }
@@ -162,16 +160,16 @@ class PembimbingLapanganController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $mahasiswa = Mahasiswa::with('pulang')->where('nim', $request->nim)->first();
-            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
-            if ($mahasiswa && $pulang) {
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            if ($mahasiswa) {
                 return response()->json([
-                    "message" => "kamu berhasil mengirim detail data mahasiswa",
+                    "message" => "kamu berhasil presensi pulang",
                     "data" => $mahasiswa
                 ]);
             } else {
                 return response()->json([
-                    "message" => "mahasiswa atau datang salah",
+                    "message" => "nim kamu tidak terdaftar pada pembimbing lapangan ini"
                 ]);
             }
         }
@@ -180,12 +178,12 @@ class PembimbingLapanganController extends Controller
         ]);
     }
 
-    public function check_mahasiswa_pulang()
+    public function check_mahasiswa_pulang(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
@@ -202,16 +200,16 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
-            $hadir = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
-            $hadir->update([
+            $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
+            $pulang->update([
                 "keterangan" => "hadir"
             ]);
 
             return response()->json([
-                "message" => "kamu berhasil mengirim data presensi pulang",
+                "message" => "kamu berhasil verifikasi data pulang",
                 "data" => [
-                    $mahasiswa
+                    Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
                 ]
             ]);
         }

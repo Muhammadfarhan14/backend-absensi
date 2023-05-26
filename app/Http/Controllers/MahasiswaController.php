@@ -83,7 +83,7 @@ class MahasiswaController extends Controller
     public function update(UpdateMahasiswaRequest $request, $id)
     {
         $mhs = Mahasiswa::where('id', $id)->first();
-        $user = User::where('id',$mhs->user_id)->where('roles','mahasiswa')->first();
+        $user = User::where('id', $mhs->user_id)->where('roles', 'mahasiswa')->first();
 
         if ($request->gambar) {
             $file_path = public_path() . '/images/' . $mhs->gambar;
@@ -107,7 +107,6 @@ class MahasiswaController extends Controller
                 'nama' => $mhs->nama,
                 'password' => Hash::make($request->password),
             ]);
-
         } else {
             $mhs->update([
                 'nama' => $request->nama,
@@ -144,63 +143,10 @@ class MahasiswaController extends Controller
     }
 
 
-    // api
-    public function show()
-    {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::with('datang', 'kegiatan', 'kendala', 'pulang')->where('user_id', $user->id)->first();
-            return response()->json([
-                "message" => "kamu berhasil mengambil data",
-                "data" => [
-                    $mahasiswa,
-                ]
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
-    }
+    ##api##
 
-    public function datang_check_mahasiswa(Request $request)
-    {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('nim',$request->nim)->first();
-            return response()->json([
-                "message" => "kamu berhasil datang",
-                "data" => [
-                    $mahasiswa
-                ]
-            ]);
-    }
-    return response()->json([
-        "message" => "kamu gagal mengirim data"
-    ]);
-    }
-    // datang
-    public function datang_action()
-    {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $mhs = Datang::create([
-                'mahasiswa_id' => $mahasiswa->id
-            ]);
-
-            return response()->json([
-                "message" => "kamu berhasil datang",
-                "data" => [
-                    $mhs
-                ]
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
-    }
-
-    public function datang_action_2(Request $request)
+    //datang
+    public function datang_action(Request $request)
     {
 
         $user = Auth::user();
@@ -211,7 +157,7 @@ class MahasiswaController extends Controller
             ]);
 
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
+            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
             if ($request->gambar) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
@@ -219,6 +165,7 @@ class MahasiswaController extends Controller
                 $foto->move($destinationPath, $profileImage);
 
                 $datang->update([
+                    "keterangan" => "hadir",
                     'gambar' => $profileImage
                 ]);
             }
@@ -226,7 +173,7 @@ class MahasiswaController extends Controller
             return response()->json([
                 "messagge" => "kamu berhasil tambah gambar datang",
                 "data" => [
-                    $datang
+                  Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
                 ]
             ]);
         }
@@ -235,6 +182,7 @@ class MahasiswaController extends Controller
         ]);
     }
 
+    // kendala
     public function kendala_action(Request $request)
     {
         $user = Auth::user();
@@ -257,28 +205,8 @@ class MahasiswaController extends Controller
         ]);
     }
 
-    public function pulang_action()
-    {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            Pulang::create([
-                'mahasiswa_id' => $mahasiswa->id
-            ]);
-
-            return response()->json([
-                "message" => "kamu berhasil pulang",
-                "data" => [
-                    Pulang::where('mahasiswa_id', $mahasiswa->id)->first()
-                ]
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
-    }
-
-    public function pulang_action_2(Request $request)
+    // pulang
+    public function pulang_action(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
@@ -287,14 +215,14 @@ class MahasiswaController extends Controller
             ]);
 
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->first();
 
             if ($request->gambar) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
                 $profileImage = Str::slug($mahasiswa->nama) . "-pulang" . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
-                $pulang->update([
+                Pulang::create([
+                    "mahasiswa_id" => $mahasiswa->id,
                     'gambar' => $profileImage
                 ]);
             }
@@ -302,7 +230,7 @@ class MahasiswaController extends Controller
             return response()->json([
                 "messagge" => "kamu berhasil tambah gambar pulang",
                 "data" => [
-                    $pulang
+                    Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
                 ]
             ]);
         }
@@ -312,13 +240,11 @@ class MahasiswaController extends Controller
     }
 
     // kegiatan
-    public function check_mahasiswa(Request $request)
+    public function kegiatan(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
-
-            $mahasiswa = Mahasiswa::where('nim',$request->nim)->first();
-
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             Kegiatan::create([
                 'deskripsi' => $request->deskripsi,
                 'jam_mulai' => $request->jam_mulai,
@@ -327,12 +253,11 @@ class MahasiswaController extends Controller
             ]);
 
             return response()->json([
-                "message" => "kamu berhasil membuat data kegiatan",
-                "data" => [
-                    Kegiatan::where('mahasiswa_id', $mahasiswa->id)->get()
-                ]
+                "message" => "kamu menambahkan kegiatan",
+                "data" => Kegiatan::where('mahasiswa_id', $mahasiswa->id)->get()
             ]);
         }
+
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);

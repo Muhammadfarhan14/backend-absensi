@@ -23,6 +23,10 @@ Route::get('/', function () {
 })->name('login.web');
 Route::post('/', [AuthController::class,'login'])->name('login');
 
+Route::get('tabel-kegiatan', function(){
+    return view('Admin.pages.tabke.kegiatan');
+});
+
 
 Route::prefix('admin')->middleware('auth')->group( function(){
     Route::get('/dashboard', function () {
@@ -33,4 +37,5 @@ Route::prefix('admin')->middleware('auth')->group( function(){
     Route::resource('dosen-pembimbing',DosenPembimbingController::class)->except('create','edit','show');
     Route::resource('lokasi',LokasiController::class)->except('create','edit','show');
     Route::get('logout',[AuthController::class,'logout_web'])->name('logout.web');
+
 });

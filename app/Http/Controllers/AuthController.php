@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\DosenPembimbing;
+use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +36,7 @@ class AuthController extends Controller
     #auth admin web
     public function login(Request $request)
     {
-       $krendensil = $request->validate([
+        $krendensil = $request->validate([
             'username' => 'required',
             'password' => 'required'
         ]);
@@ -58,7 +61,7 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'username' => ['Kredensial yang diberikan salah'],
             ]);
@@ -71,10 +74,46 @@ class AuthController extends Controller
     public function me()
     {
         $user = Auth::user();
-        return response()->json([
-            "message" => "data user yang login",
-            "data" => $user
-        ]);
-    }
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+        $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+        $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+        if ($user->roles == 'mahasiswa') {
+            return response()->json([
+                "message" => "data user yang login",
+                "data" => [
+                    "nama" => $mahasiswa->nama,
+                    "roles" => $user->roles,
+                    "nim" => $mahasiswa->nim,
+                    "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
+                    "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
+                    "lokasi" => $mahasiswa->lokasi->nama,
+                    "datang" => $mahasiswa->datang,
+                    "pulang" => $mahasiswa->pulang,
+                    "kegiatan" => $mahasiswa->kegiatan,
+                    "kendala" => $mahasiswa->kendala
+                ],
+            ]);
+        }
 
+        if ($user->roles == 'pembimbing_lapangan') {
+            return response()->json([
+                "message" => "data user yang login",
+                "data" => [
+                    "nama" => $pembimbing_lapangan->nama,
+                    "roles" => $user->roles,
+                ],
+            ]);
+        }
+
+        if ($user->roles == 'dosen_pembimbing') {
+            return response()->json([
+                "message" => "data user yang login",
+                "data" => [
+                    "nama" => $dosen_pembimbing->nama,
+                    "roles" => $user->roles,
+                ],
+            ]);
+        }
+
+    }
 }

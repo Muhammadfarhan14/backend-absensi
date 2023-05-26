@@ -4,9 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DosenPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PembimbingLapanganController;
-use App\Models\DosenPembimbing;
-use App\Models\Mahasiswa;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,14 +36,12 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // datang
     Route::prefix('datang')->group(function () {
-        Route::post('check-mahasiswa',[MahasiswaController::class,'datang_check_mahasiswa']);
         Route::post('create', [MahasiswaController::class, 'datang_action'])->name('datang.create');
-        Route::post('create-foto', [MahasiswaController::class, 'datang_action_2'])->name('datang.update');
     });
 
     // kegiatan
     Route::prefix('kegiatan')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'check_mahasiswa'])->name('kegiatan.create');
+        Route::post('create', [MahasiswaController::class, 'kegiatan'])->name('kegiatan.create');
     });
 
     // kendala
@@ -56,8 +51,7 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // pulang
     Route::prefix('pulang')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'pulang_action'])->name('pulang.create');
-        Route::post('create-foto', [MahasiswaController::class, 'pulang_action_2'])->name('pulang.update');
+        Route::post('create', [MahasiswaController::class, 'pulang_action']);
     });
 });
 #end mahasiswa
@@ -66,11 +60,11 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function(){
     Route::get('onboarding',[PembimbingLapanganController::class,'onboarding']);
     // datang
-    Route::post('check_presensi_datang',[PembimbingLapanganController::class,'check_presensi_datang']);
+    Route::get('check_presensi_datang',[PembimbingLapanganController::class,'check_presensi_datang']);
     Route::get('check_mahasiswa_datang',[PembimbingLapanganController::class,'check_mahasiswa_datang']);
     Route::post('konfirmasi_presensi_datang',[PembimbingLapanganController::class,'konfirmasi_presensi_datang']);
     // pulang
-    Route::post('check_presensi_pulang',[PembimbingLapanganController::class,'check_presensi_pulang']);
+    Route::get('check_presensi_pulang',[PembimbingLapanganController::class,'check_presensi_pulang']);
     Route::get('check_mahasiswa_pulang',[PembimbingLapanganController::class,'check_mahasiswa_pulang']);
     Route::post('konfirmasi_presensi_pulang',[PembimbingLapanganController::class,'konfirmasi_presensi_pulang']);
 

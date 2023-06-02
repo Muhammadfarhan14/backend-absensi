@@ -42,17 +42,20 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // kegiatan
     Route::prefix('kegiatan')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'kegiatan'])->name('kegiatan.create');
+        Route::post('create', [MahasiswaController::class, 'kegiatan']);
+        Route::get('detail_kegiatan_by_tanggal', [MahasiswaController::class, 'detail_kegiatan_by_tanggal']);
     });
 
     // kendala
     Route::prefix('kendala')->group(function () {
         Route::post('create', [MahasiswaController::class, 'kendala_action'])->name('kendala.create');
+        Route::get('detail_kendala_by_tanggal', [MahasiswaController::class, 'detail_kendala_by_tanggal']);
     });
 
     // pulang
     Route::prefix('pulang')->group(function () {
         Route::post('create', [MahasiswaController::class, 'pulang_action']);
+        Route::get('detail_pulang_by_tanggal', [MahasiswaController::class, 'detail_pulang_by_tanggal']);
     });
 });
 #end mahasiswa

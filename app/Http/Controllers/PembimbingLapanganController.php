@@ -137,7 +137,7 @@ class PembimbingLapanganController extends Controller
             foreach ($datang as $item) {
                 if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
                     return response()->json([
-                        "message" => "Data Sudah Ada",
+                        "message" => "data datang hari ini sudah ada",
                         "data" => null
                     ]);
                 }

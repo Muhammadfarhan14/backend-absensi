@@ -211,6 +211,19 @@ class MahasiswaController extends Controller
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $kendala = Kendala::get();
+            $today = Carbon::now()->format('Y-m-d');
+            foreach ($kendala as $item) {
+                if($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id){
+                    return response()->json([
+                        "message" => "data kendala hari ini sudah ada",
+                        "data" => [
+                           null
+                        ]
+                    ]);
+                }
+            }
+
             Kendala::create([
                 'deskripsi' => $request->deskripsi,
                 'mahasiswa_id' => $mahasiswa->id
@@ -220,6 +233,26 @@ class MahasiswaController extends Controller
                 "message" => "kamu berhasil membuat deskripsi kendala",
                 "data" => [
                     Kendala::where('mahasiswa_id', $mahasiswa->id)->first()
+                ]
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function detail_kendala_by_tanggal()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $today = Carbon::now()->format('Y-m-d');
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $kendala = Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+
+            return response()->json([
+                "message" => "kamu berhasil mengambil data kendala hari ini",
+                "data" => [
+                    $kendala
                 ]
             ]);
         }
@@ -251,7 +284,7 @@ class MahasiswaController extends Controller
                 foreach ($pulang as $item) {
                     if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
                         return response()->json([
-                            "messagge" => "data sudah ada",
+                            "messagge" => "data pulang hari ini sudah ada",
                             "data" => [ null ]
                         ]);
                     }
@@ -267,6 +300,26 @@ class MahasiswaController extends Controller
                 "messagge" => "kamu berhasil tambah gambar pulang",
                 "data" => [
                     Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
+                ]
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function detail_pulang_by_tanggal()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $today = Carbon::now()->format('Y-m-d');
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+
+            return response()->json([
+                "message" => "kamu berhasil mengambil data pulang hari ini",
+                "data" => [
+                    $pulang
                 ]
             ]);
         }
@@ -294,6 +347,26 @@ class MahasiswaController extends Controller
             ]);
         }
 
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function detail_kegiatan_by_tanggal()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $today = Carbon::now()->format('Y-m-d');
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $kegiatan = kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->get();
+
+            return response()->json([
+                "message" => "kamu berhasil mengambil data kegiatan hari ini",
+                "data" => [
+                    $kegiatan
+                ]
+            ]);
+        }
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);

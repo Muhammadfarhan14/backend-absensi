@@ -89,6 +89,7 @@ class AuthController extends Controller
                     "gambar dosen_pembimbing" => $mahasiswa->dosen_pembimbing->gambar,
                     "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
+                    "gambar lokasi" => $mahasiswa->lokasi->gambar,
                     "datang" => $mahasiswa->datang,
                     "pulang" => $mahasiswa->pulang,
                     "kegiatan" => $mahasiswa->kegiatan,

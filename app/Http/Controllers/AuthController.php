@@ -88,22 +88,29 @@ class AuthController extends Controller
                     "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
                     "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
-                    "datang" => $mahasiswa->datang,
-                    "pulang" => $mahasiswa->pulang,
-                    "kegiatan" => $mahasiswa->kegiatan,
-                    "kendala" => $mahasiswa->kendala
+                    // "datang" => $mahasiswa->datang,
+                    // "pulang" => $mahasiswa->pulang,
+                    // "kegiatan" => $mahasiswa->kegiatan,
+                    // "kendala" => $mahasiswa->kendala
                 ],
             ]);
         }
 
         if ($user->roles == 'pembimbing_lapangan') {
-            return response()->json([
-                "message" => "data user yang login",
-                "data" => [
-                    "nama" => $pembimbing_lapangan->nama,
-                    "roles" => $user->roles,
-                ],
-            ]);
+            $mhs = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->get();
+            foreach ($mhs as $item) {
+                $item->lokasi;
+
+                return response()->json([
+                    "message" => "data user yang login",
+                    "data" => [
+                        "nama_pembimbing_lapangan" => $pembimbing_lapangan->nama,
+                        "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama ,
+                        "roles" => $user->roles,
+                        "lokasi" => $item->lokasi
+                    ],
+                ]);
+            }
         }
 
         if ($user->roles == 'dosen_pembimbing') {

@@ -10,8 +10,6 @@ class Lokasi extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    protected $with = ['mahasiswa'];
-
     public function mahasiswa()
     {
         return $this->hasMany(Mahasiswa::class);

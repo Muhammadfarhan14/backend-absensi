@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PembimbingLapanganRequest;
 use App\Models\User;
 use App\Models\Datang;
-use App\Models\Lokasi;
 use App\Models\Pulang;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class PembimbingLapanganController extends Controller
 {
@@ -72,22 +72,12 @@ class PembimbingLapanganController extends Controller
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('datang', 'pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
-            $mhs = Mahasiswa::with('datang', 'pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" => [
                     "mahasiswa" => $mahasiswa,
                 ],
-                [
-                    "lokasi" =>  $mhs->lokasi,
-                ],
-                [
-                    "pembimbing lapangan" =>  $mhs->pembimbing_lapangan->nama,
-                ],
-                [
-                    "dosen pembimbing" =>   $mhs->dosen_pembimbing->nama,
-                ]
             ]);
         }
         return response()->json([
@@ -141,6 +131,18 @@ class PembimbingLapanganController extends Controller
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+
+            $datang = Datang::get();
+            $today = Carbon::now()->format('Y-m-d');
+            foreach ($datang as $item) {
+                if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
+                    return response()->json([
+                        "message" => "Data Sudah Ada",
+                        "data" => null
+                    ]);
+                }
+            }
+
             Datang::create([
                 'mahasiswa_id' => $mahasiswa->id
             ]);
@@ -150,6 +152,7 @@ class PembimbingLapanganController extends Controller
                     Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
                 ]
             ]);
+
         }
         return response()->json([
             "message" => "kamu gagal mengirim data"

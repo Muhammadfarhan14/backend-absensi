@@ -36,7 +36,8 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     // datang
     Route::prefix('datang')->group(function () {
-        Route::post('create', [MahasiswaController::class, 'datang_action'])->name('datang.create');
+        Route::post('create', [MahasiswaController::class, 'datang_action']);
+        Route::get('detail_datang_by_tanggal', [MahasiswaController::class, 'detail_datang_by_tanggal']);
     });
 
     // kegiatan

@@ -56,8 +56,8 @@ class MahasiswaController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $baseURL= url('/');
-        $profileImage = $baseURL. "/images/". Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+        $baseURL = url('/');
+        $profileImage = $baseURL . "/images/" . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
         $mhs->gambar = $profileImage;
         $mhs->save();
@@ -88,13 +88,13 @@ class MahasiswaController extends Controller
         $user = User::where('id', $mhs->user_id)->where('roles', 'mahasiswa')->first();
 
         if ($request->gambar) {
-            $baseURL= url('/');
-            $file_path = Str::replace($baseURL.'/images/','', public_path().'/images/'.$mhs->gambar);
+            $baseURL = url('/');
+            $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $mhs->gambar);
             unlink($file_path);
 
             $foto = $request->file('gambar');
             $destinationPath = 'images/';
-            $profileImage = $baseURL. "/images/". Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+            $profileImage = $baseURL . "/images/" . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
             $foto->move($destinationPath, $profileImage);
 
             $mhs->update([
@@ -138,8 +138,8 @@ class MahasiswaController extends Controller
     {
         $mhs = Mahasiswa::where('id', $id)->first();
         $user = User::where('id', $mhs->user_id)->first();
-        $baseURL= url('/');
-        $file_path = Str::replace($baseURL.'/images/','', public_path().'/images/'.$mhs->gambar);
+        $baseURL = url('/');
+        $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $mhs->gambar);
         unlink($file_path);
         $mhs->delete();
         $user->delete();
@@ -151,7 +151,6 @@ class MahasiswaController extends Controller
     //datang
     public function datang_action(Request $request)
     {
-
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
 
@@ -165,7 +164,7 @@ class MahasiswaController extends Controller
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
                 $baseURL = url('/');
-                $profileImage = $baseURL .'/images/'. Str::slug($mahasiswa->nama) . "-datang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+                $profileImage = $baseURL . '/images/' . Str::slug($mahasiswa->nama) . "-datang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
 
                 $datang->update([
@@ -177,7 +176,27 @@ class MahasiswaController extends Controller
             return response()->json([
                 "messagge" => "kamu berhasil tambah gambar datang",
                 "data" => [
-                  Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
+                    Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
+                ]
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function detail_datang_by_tanggal()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $today = Carbon::now()->format('Y-m-d');
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+
+            return response()->json([
+                "message" => "kamu berhasil mengambil data datang hari ini",
+                "data" => [
+                    $datang
                 ]
             ]);
         }
@@ -224,8 +243,20 @@ class MahasiswaController extends Controller
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
                 $baseURL = url('/');
-                $profileImage = $baseURL.'/images/'.Str::slug($mahasiswa->nama) . "-pulang". '-' . Carbon::now()->format('YmdHis'). "." . $foto->getClientOriginalExtension();
+                $profileImage = $baseURL . '/images/' . Str::slug($mahasiswa->nama) . "-pulang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
+
+                $pulang = Pulang::get();
+                $today = Carbon::now()->format('Y-m-d');
+                foreach ($pulang as $item) {
+                    if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
+                        return response()->json([
+                            "messagge" => "data sudah ada",
+                            "data" => [ null ]
+                        ]);
+                    }
+                }
+
                 Pulang::create([
                     "mahasiswa_id" => $mahasiswa->id,
                     'gambar' => $profileImage

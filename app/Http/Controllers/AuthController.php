@@ -82,9 +82,11 @@ class AuthController extends Controller
                 "message" => "data user yang login",
                 "data" => [
                     "nama" => $mahasiswa->nama,
-                    "roles" => $user->roles,
                     "nim" => $mahasiswa->nim,
+                    "gambar" => $mahasiswa->gambar,
+                    "roles" => $user->roles,
                     "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
+                    "gambar dosen_pembimbing" => $mahasiswa->dosen_pembimbing->gambar,
                     "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
                     "datang" => $mahasiswa->datang,

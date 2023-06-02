@@ -17,6 +17,7 @@ use App\Models\DosenPembimbing;
 use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 
 
@@ -55,7 +56,8 @@ class MahasiswaController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+        $baseURL= url('/');
+        $profileImage = $baseURL. "/images/". Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
         $mhs->gambar = $profileImage;
         $mhs->save();
@@ -91,7 +93,7 @@ class MahasiswaController extends Controller
 
             $foto = $request->file('gambar');
             $destinationPath = 'images/';
-            $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+            $profileImage = Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
             $foto->move($destinationPath, $profileImage);
 
             $mhs->update([
@@ -135,7 +137,9 @@ class MahasiswaController extends Controller
     {
         $mhs = Mahasiswa::where('id', $id)->first();
         $user = User::where('id', $mhs->user_id)->first();
-        $file_path = public_path() . '/images/' . $mhs->gambar;
+        $baseURL= url('/');
+        $file_path = Str::replace($baseURL.'/images/','', $mhs->gambar);
+        // dd($file_path);
         unlink($file_path);
         $mhs->delete();
         $user->delete();
@@ -161,7 +165,7 @@ class MahasiswaController extends Controller
             if ($request->gambar) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
-                $profileImage = Str::slug($mahasiswa->nama) . "-datang" . "." . $foto->getClientOriginalExtension();
+                $profileImage = Str::slug($mahasiswa->nama) . "-datang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
 
                 $datang->update([
@@ -219,7 +223,7 @@ class MahasiswaController extends Controller
             if ($request->gambar) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
-                $profileImage = Str::slug($mahasiswa->nama) . "-pulang" . "." . $foto->getClientOriginalExtension();
+                $profileImage = Str::slug($mahasiswa->nama) . "-pulang". '-' . Carbon::now()->format('YmdHis'). "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
                 Pulang::create([
                     "mahasiswa_id" => $mahasiswa->id,

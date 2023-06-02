@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\DosenPembimbing;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DosenPembimbingController extends Controller
 {
@@ -37,7 +38,7 @@ class DosenPembimbingController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+        $profileImage = Str::slug($request->nama). '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
         $dosen_pembimbing = new DosenPembimbing();
@@ -213,7 +214,7 @@ class DosenPembimbingController extends Controller
 
     public function table_kegiatan()
     {
-        
+
     }
 
 

@@ -6,8 +6,8 @@ use App\Http\Requests\LokasiRequest;
 use App\Http\Requests\UpdateLokasiRequest;
 use App\Models\Lokasi;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+
 
 class LokasiController extends Controller
 {
@@ -22,7 +22,7 @@ class LokasiController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+        $profileImage = Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
         Lokasi::create([
@@ -46,7 +46,7 @@ class LokasiController extends Controller
             $lokasi->alamat = $request->alamat;
             $foto = $request->file('gambar');
             $destinationPath = 'images/';
-            $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+            $profileImage = Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
             $foto->move($destinationPath, $profileImage);
             $lokasi->gambar = $profileImage;
             $lokasi->update();

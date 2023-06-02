@@ -22,7 +22,7 @@ class DosenPembimbingController extends Controller
 {
     public function index()
     {
-        $dosen_pembimbing = User::with('dosen_pembimbing')->where('roles','dosen_pembimbing')->get();
+        $dosen_pembimbing = User::with('dosen_pembimbing')->where('roles', 'dosen_pembimbing')->get();
         return view('Admin.pages.dosen-pembimbing.index', ['data' => $dosen_pembimbing]);
     }
 
@@ -38,7 +38,8 @@ class DosenPembimbingController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $profileImage = Str::slug($request->nama). '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
+        $baseURL = url('/');
+        $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
         $dosen_pembimbing = new DosenPembimbing();
@@ -52,16 +53,17 @@ class DosenPembimbingController extends Controller
 
     public function update(UpdateDosenPembimbingRequest $request, $id)
     {
-        $user = User::where('id',$id)->first();
+        $user = User::where('id', $id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
 
         if ($request->gambar) {
-            $file_path = public_path() . '/images/' . $dosen_pembimbing->gambar;
+            $baseURL = url('/');
+            $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
             unlink($file_path);
 
             $foto = $request->file('gambar');
             $destinationPath = 'images/';
-            $profileImage = Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+            $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
             $foto->move($destinationPath, $profileImage);
 
             $user->update([
@@ -74,7 +76,6 @@ class DosenPembimbingController extends Controller
                 'nama' => $user->nama,
                 'gambar' => $profileImage
             ]);
-
         } else {
             $user->update([
                 'username' => $request->username,
@@ -84,16 +85,16 @@ class DosenPembimbingController extends Controller
             $dosen_pembimbing->update([
                 'nama' => $user->nama,
             ]);
-
         }
         return redirect()->route('dosen-pembimbing.index');
     }
 
     public function destroy($id)
     {
-        $user = User::where('id',$id)->first();
+        $user = User::where('id', $id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-        $file_path = public_path() . '/images/' . $dosen_pembimbing->gambar;
+        $baseURL = url('/');
+        $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
         unlink($file_path);
         $dosen_pembimbing->delete();
         $user->delete();
@@ -107,8 +108,8 @@ class DosenPembimbingController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
-            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
-            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id',$dosen_pembimbing->id)->get();
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
             $lokasi_ppl = [];
             foreach ($mahasiswa as $key => $value) {
                 $lokasi_ppl[$key] = Lokasi::where('id', $value->lokasi_id)->first();
@@ -118,10 +119,10 @@ class DosenPembimbingController extends Controller
                 "message" => "kamu berhasil mengirim data pembimbing lapangan dan lokasi PPL",
                 "data" =>
                 [
-                  "dosen pembimbing" => $user
+                    "dosen pembimbing" => $user
                 ],
                 [
-                   "lokasi" => $lokasi_ppl,
+                    "lokasi" => $lokasi_ppl,
                 ],
                 [
                     "mahasiswa" => $mahasiswa
@@ -131,21 +132,20 @@ class DosenPembimbingController extends Controller
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
-
     }
 
     public function detail_lokasi_ppl()
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
-            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang','pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
-            $mhs = Mahasiswa::with('datang','pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::with('datang', 'pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+            $mhs = Mahasiswa::with('datang', 'pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" =>[
-                   "mahasiswa" => $mahasiswa,
+                "data" => [
+                    "mahasiswa" => $mahasiswa,
                 ],
                 [
                     "lokasi" =>  $mhs->lokasi,
@@ -167,15 +167,15 @@ class DosenPembimbingController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
-            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
-            $jam_mulai = Kegiatan::where('mahasiswa_id',$mahasiswa->id)->first();
-            $jam_selesai = Kegiatan::where('mahasiswa_id',$mahasiswa->id)->latest()->first();
+            $jam_mulai = Kegiatan::where('mahasiswa_id', $mahasiswa->id)->first();
+            $jam_selesai = Kegiatan::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" =>[
-                   "mahasiswa" => $mahasiswa,
+                "data" => [
+                    "mahasiswa" => $mahasiswa,
                 ],
                 [
                     "waktu kegiatan" =>
@@ -193,7 +193,7 @@ class DosenPembimbingController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
-            $dosen_pembimbing = DosenPembimbing::where('user_id',$user->id)->first();
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
             $kendala = Kendala::where('status', false)->first();
             $kendala->update([
@@ -202,8 +202,8 @@ class DosenPembimbingController extends Controller
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" =>[
-                   "mahasiswa" => $mahasiswa,
+                "data" => [
+                    "mahasiswa" => $mahasiswa,
                 ],
             ]);
         }
@@ -214,10 +214,8 @@ class DosenPembimbingController extends Controller
 
     public function table_kegiatan()
     {
-
     }
 
-
-#end dosen pembimbing
+    #end dosen pembimbing
 
 }

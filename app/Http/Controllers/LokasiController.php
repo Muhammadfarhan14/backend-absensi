@@ -22,7 +22,8 @@ class LokasiController extends Controller
 
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
-        $profileImage = Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
+        $baseURL = url('/');
+        $profileImage = $baseURL.'/images/'.Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
         Lokasi::create([

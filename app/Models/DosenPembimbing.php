@@ -14,8 +14,6 @@ class DosenPembimbing extends Model
     protected $guarded = ['id'];
     protected $table = 'dosen_pembimbing';
 
-    protected $with = ['mahasiswa'];
-
     public function user()
     {
         return $this->belongsTo(User::class);

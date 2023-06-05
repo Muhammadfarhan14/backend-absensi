@@ -31,6 +31,7 @@
                         <tbody>
                             @foreach ($data as $item)
                             <tr>
+                                {{-- @dd($item); --}}
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->dosen_pembimbing->nama }}</td>
                                 <td>{{ $item->username }}</td>

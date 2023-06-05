@@ -30,10 +30,13 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $baseURL = url('/');
+                            @endphp
                             @foreach ($lokasi as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td><img src="{{asset('../images/'. $item->gambar)}}" width="150px" alt=""></td>
+                                <td><img src="{{asset(Str::replace($baseURL . '/images/', '',  '/images/' . $item->gambar))}}" width="150px" alt=""></td>
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ Str::limit($item->alamat,20) }}</td>
                                 <td>

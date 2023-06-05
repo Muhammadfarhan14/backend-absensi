@@ -290,10 +290,20 @@ class MahasiswaController extends Controller
                     }
                 }
 
-                Pulang::create([
-                    "mahasiswa_id" => $mahasiswa->id,
-                    'gambar' => $profileImage
-                ]);
+                $cekHariPertama = Pulang::where('mahasiswa_id',$mahasiswa->id)->first();
+                if($cekHariPertama == null){
+                    Pulang::create([
+                        "mahasiswa_id" => $mahasiswa->id,
+                        'hari_pertama' => true,
+                        'gambar' => $profileImage
+                    ]);
+                }else{
+                    Pulang::create([
+                        "mahasiswa_id" => $mahasiswa->id,
+                        'hari_pertama' => false,
+                        'gambar' => $profileImage
+                    ]);
+                }
             }
 
             return response()->json([

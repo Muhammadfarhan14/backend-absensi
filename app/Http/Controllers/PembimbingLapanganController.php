@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PembimbingLapanganRequest;
 use App\Models\User;
 use App\Models\Datang;
+use App\Models\KriteriaPenilaian;
 use App\Models\Pulang;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
@@ -143,16 +144,25 @@ class PembimbingLapanganController extends Controller
                 }
             }
 
-            Datang::create([
-                'mahasiswa_id' => $mahasiswa->id
-            ]);
+            $checkDataPertama = Datang::where('mahasiswa_id',$mahasiswa->id)->first();
+            if ($checkDataPertama == null) {
+                Datang::create([
+                    'mahasiswa_id' => $mahasiswa->id,
+                    'hari_pertama' => true
+                ]);
+            }else{
+                Datang::create([
+                    'mahasiswa_id' => $mahasiswa->id,
+                    'hari_pertama' => false
+                ]);
+            }
+
             return response()->json([
                 "message" => "kamu berhasil membuat data datang",
                 "data" => [
                     Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
-                ]
+                ],
             ]);
-
         }
         return response()->json([
             "message" => "kamu gagal mengirim data"
@@ -219,6 +229,43 @@ class PembimbingLapanganController extends Controller
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
+    }
+
+    public function check_hari_ke_45()
+    {
+        $user = Auth::user();
+        if($user->roles == 'pembimbing_lapangan'){
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->first();
+
+            $hariPertamaDatang = Datang::where('mahasiswa_id',$mahasiswa->id)->where('hari_pertama', true)->first();
+            if($hariPertamaDatang){
+            $tanggalHariPertamaDatang = Carbon::parse($hariPertamaDatang->tanggal);
+            $hariTerakhirDatang = $tanggalHariPertamaDatang->addRealDays(44);
+            }
+
+            $hariPertamaPulang = Pulang::where('mahasiswa_id',$mahasiswa->id)->where('hari_pertama',true)->first();
+            if($hariPertamaPulang){
+                $tanggalHariPertamaPulang = Carbon::parse($hariPertamaPulang->tanggal);
+                $hariTerakhirPulang = $tanggalHariPertamaPulang->addRealDays(44);
+            }
+
+            $today = Carbon::now()->format('Y-m-d');
+            if ($hariTerakhirDatang <= $today && $hariTerakhirPulang <= $today){
+                $muncul = true;
+                return response()->json([
+                    "message" => "hari ini sudah hari ke 45",
+                    "data" => $muncul
+                ]);
+            }else{
+                $muncul = false;
+                return response()->json([
+                    "message" => "hari ini belum mencapai hari ke 45",
+                    "data" => $muncul
+                ]);
+            }
+
+        }
     }
     #end api pembimbing lapangan
 }

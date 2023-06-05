@@ -20,20 +20,26 @@ class Mahasiswa extends Model
     // kendala
     public function kendala()
     {
-        return $this->hasOne(Kendala::class);
+        return $this->hasMany(Kendala::class);
     }
 
     // datang
     public function datang()
     {
-        return $this->hasOne(Datang::class);
+        return $this->hasMany(Datang::class);
     }
 
     // pulang
     public function pulang()
     {
-        return $this->hasOne(Pulang::class);
+        return $this->hasMany(Pulang::class);
     }
+
+     // kriteria penilian
+     public function kriteria_penilaian()
+     {
+         return $this->hasOne(KriteriaPenilaian::class);
+     }
 
     // user
     public function user()
@@ -58,4 +64,5 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(DosenPembimbing::class);
     }
+
 }

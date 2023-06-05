@@ -72,6 +72,9 @@ Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function
     Route::get('check_mahasiswa_pulang',[PembimbingLapanganController::class,'check_mahasiswa_pulang']);
     Route::post('konfirmasi_presensi_pulang',[PembimbingLapanganController::class,'konfirmasi_presensi_pulang']);
 
+    // check hari ke 45
+    Route::get('check_hari_ke_45',[PembimbingLapanganController::class,'check_hari_ke_45']);
+
 });
 #end pembimbing lapangan
 

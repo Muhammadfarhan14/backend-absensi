@@ -14,7 +14,7 @@ class LokasiController extends Controller
     public function index()
     {
         $lokasi = Lokasi::get();
-        return view('Admin.pages.lokasi.index',['lokasi' => $lokasi]);
+        return view('Admin.pages.lokasi.index', ['lokasi' => $lokasi]);
     }
 
     public function store(LokasiRequest $request)
@@ -23,7 +23,7 @@ class LokasiController extends Controller
         $foto = $request->file('gambar');
         $destinationPath = 'images/';
         $baseURL = url('/');
-        $profileImage = $baseURL.'/images/'.Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
+        $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
         $foto->move($destinationPath, $profileImage);
 
         Lokasi::create([
@@ -35,23 +35,24 @@ class LokasiController extends Controller
         return redirect()->route('lokasi.index');
     }
 
-    public function update(UpdateLokasiRequest $request,$id)
+    public function update(UpdateLokasiRequest $request, $id)
     {
-        $lokasi = Lokasi::where('id',$id)->first();
+        $lokasi = Lokasi::where('id', $id)->first();
 
-        if($request->gambar){
-            $file_path = public_path().'/images/'.$lokasi->gambar;
+        if ($request->gambar) {
+            $baseURL = url('/');
+            $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $lokasi->gambar);
             unlink($file_path);
 
             $lokasi->nama = $request->nama;
             $lokasi->alamat = $request->alamat;
             $foto = $request->file('gambar');
             $destinationPath = 'images/';
-            $profileImage = Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+            $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
             $foto->move($destinationPath, $profileImage);
             $lokasi->gambar = $profileImage;
             $lokasi->update();
-        }else{
+        } else {
             $lokasi->nama = $request->nama;
             $lokasi->alamat = $request->alamat;
             $lokasi->update();
@@ -62,11 +63,11 @@ class LokasiController extends Controller
 
     public function destroy($id)
     {
-        $lokasi = Lokasi::where('id',$id)->first();
-        $file_path = public_path().'/images/'.$lokasi->gambar;
+        $lokasi = Lokasi::where('id', $id)->first();
+        $baseURL = url('/');
+        $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $lokasi->gambar);
         unlink($file_path);
         $lokasi->delete();
         return redirect()->route('lokasi.index');
-
     }
 }

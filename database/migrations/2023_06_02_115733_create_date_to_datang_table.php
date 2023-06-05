@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('datangs', function (Blueprint $table) {
-            $table->date('tanggal')->default(Carbon::now()->format('Y-m-d'))->unique()->after('keterangan');
+            $table->date('tanggal')->default(Carbon::now()->format('Y-m-d'))->after('keterangan');
         });
     }
 

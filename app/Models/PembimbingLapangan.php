@@ -12,8 +12,6 @@ class PembimbingLapangan extends Model
     protected $guarded = ['id'];
     protected $table = 'pembimbing_lapangan';
 
-    protected $with = ['mahasiswa'];
-
     public function user()
     {
         return $this->belongsTo(PembimbingLapangan::class);

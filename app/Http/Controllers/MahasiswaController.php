@@ -226,13 +226,15 @@ class MahasiswaController extends Controller
 
             Kendala::create([
                 'deskripsi' => $request->deskripsi,
+                'tanggal' => $today,
                 'mahasiswa_id' => $mahasiswa->id
             ]);
 
+            $tanggalHariIni = Carbon::now()->toDateString();
             return response()->json([
                 "message" => "kamu berhasil membuat deskripsi kendala",
                 "data" => [
-                    Kendala::where('mahasiswa_id', $mahasiswa->id)->first()
+                    Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->latest()->first()
                 ]
             ]);
         }
@@ -295,21 +297,24 @@ class MahasiswaController extends Controller
                     Pulang::create([
                         "mahasiswa_id" => $mahasiswa->id,
                         'hari_pertama' => true,
+                        'tanggal' => $today,
                         'gambar' => $profileImage
                     ]);
                 }else{
                     Pulang::create([
                         "mahasiswa_id" => $mahasiswa->id,
                         'hari_pertama' => false,
+                        'tanggal' => $today,
                         'gambar' => $profileImage
                     ]);
                 }
             }
 
+            $tanggalHariIni = Carbon::now()->toDateString();
             return response()->json([
                 "messagge" => "kamu berhasil tambah gambar pulang",
                 "data" => [
-                    Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
+                    Pulang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->latest()->first()
                 ]
             ]);
         }
@@ -343,17 +348,20 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
         if ($user->roles == 'mahasiswa') {
+            $today = Carbon::now()->format('Y-m-d');
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
             Kegiatan::create([
                 'deskripsi' => $request->deskripsi,
                 'jam_mulai' => $request->jam_mulai,
                 'jam_selesai' => $request->jam_selesai,
+                'tanggal' => $today,
                 'mahasiswa_id' => $mahasiswa->id
             ]);
 
+            $tanggalHariIni = Carbon::now()->toDateString();
             return response()->json([
                 "message" => "kamu menambahkan kegiatan",
-                "data" => Kegiatan::where('mahasiswa_id', $mahasiswa->id)->get()
+                "data" => Kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->get()
             ]);
         }
 

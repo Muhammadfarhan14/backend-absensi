@@ -138,6 +138,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $tanggalHariIni = Carbon::now()->toDateString();
             $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
 
             $datang = Datang::get();
@@ -155,19 +156,23 @@ class PembimbingLapanganController extends Controller
             if ($checkDataPertama == null) {
                 Datang::create([
                     'mahasiswa_id' => $mahasiswa->id,
-                    'hari_pertama' => true
+                    'hari_pertama' => true,
+                    'tanggal' => $today
                 ]);
             } else {
                 Datang::create([
                     'mahasiswa_id' => $mahasiswa->id,
-                    'hari_pertama' => false
+                    'hari_pertama' => false,
+                    'tanggal' => $today
                 ]);
             }
 
             return response()->json([
                 "message" => "kamu berhasil membuat data datang",
                 "data" => [
-                    Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
+                    Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
+                        $query->whereDate('tanggal', $tanggalHariIni);
+                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
                 ],
             ]);
         }
@@ -221,6 +226,7 @@ class PembimbingLapanganController extends Controller
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $tanggalHariIni = Carbon::now()->toDateString();
             $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
             $pulang->update([
                 "keterangan" => "hadir"
@@ -229,7 +235,9 @@ class PembimbingLapanganController extends Controller
             return response()->json([
                 "message" => "kamu berhasil verifikasi data pulang",
                 "data" => [
-                    Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
+                    Mahasiswa::with(['pulang' => function ($query) use ($tanggalHariIni) {
+                        $query->whereDate('tanggal', $tanggalHariIni);
+                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
                 ]
             ]);
         }

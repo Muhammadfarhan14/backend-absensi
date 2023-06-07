@@ -72,8 +72,15 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang', 'pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
 
+            $tanggalHariIni = Carbon::now()->toDateString();
+            $mahasiswa = Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
+                $query->whereDate('tanggal', $tanggalHariIni);
+            }, 'pulang' => function ($query) use ($tanggalHariIni) {
+                $query->whereDate('tanggal', $tanggalHariIni);
+            }])
+                ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
+                ->get();
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" => [
@@ -144,13 +151,13 @@ class PembimbingLapanganController extends Controller
                 }
             }
 
-            $checkDataPertama = Datang::where('mahasiswa_id',$mahasiswa->id)->first();
+            $checkDataPertama = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
             if ($checkDataPertama == null) {
                 Datang::create([
                     'mahasiswa_id' => $mahasiswa->id,
                     'hari_pertama' => true
                 ]);
-            }else{
+            } else {
                 Datang::create([
                     'mahasiswa_id' => $mahasiswa->id,
                     'hari_pertama' => false
@@ -234,37 +241,36 @@ class PembimbingLapanganController extends Controller
     public function check_hari_ke_45()
     {
         $user = Auth::user();
-        if($user->roles == 'pembimbing_lapangan'){
+        if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
 
-            $hariPertamaDatang = Datang::where('mahasiswa_id',$mahasiswa->id)->where('hari_pertama', true)->first();
-            if($hariPertamaDatang){
-            $tanggalHariPertamaDatang = Carbon::parse($hariPertamaDatang->tanggal);
-            $hariTerakhirDatang = $tanggalHariPertamaDatang->addRealDays(44);
+            $hariPertamaDatang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->first();
+            if ($hariPertamaDatang) {
+                $tanggalHariPertamaDatang = Carbon::parse($hariPertamaDatang->tanggal);
+                $hariTerakhirDatang = $tanggalHariPertamaDatang->addRealDays(44);
             }
 
-            $hariPertamaPulang = Pulang::where('mahasiswa_id',$mahasiswa->id)->where('hari_pertama',true)->first();
-            if($hariPertamaPulang){
+            $hariPertamaPulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->first();
+            if ($hariPertamaPulang) {
                 $tanggalHariPertamaPulang = Carbon::parse($hariPertamaPulang->tanggal);
                 $hariTerakhirPulang = $tanggalHariPertamaPulang->addRealDays(44);
             }
 
             $today = Carbon::now()->format('Y-m-d');
-            if ($hariTerakhirDatang <= $today && $hariTerakhirPulang <= $today){
+            if ($hariTerakhirDatang <= $today && $hariTerakhirPulang <= $today) {
                 $muncul = true;
                 return response()->json([
                     "message" => "hari ini sudah hari ke 45",
                     "data" => $muncul
                 ]);
-            }else{
+            } else {
                 $muncul = false;
                 return response()->json([
                     "message" => "hari ini belum mencapai hari ke 45",
                     "data" => $muncul
                 ]);
             }
-
         }
     }
     #end api pembimbing lapangan

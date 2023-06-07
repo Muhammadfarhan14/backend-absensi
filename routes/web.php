@@ -6,6 +6,7 @@ use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenPembimbingController;
 use App\Http\Controllers\PembimbingLapanganController;
+use App\Http\Controllers\TabelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +24,7 @@ Route::get('/', function () {
 })->name('login.web');
 Route::post('/', [AuthController::class,'login'])->name('login');
 
-Route::get('tabel-kegiatan', function(){
-    return view('Admin.pages.tabke.kegiatan');
-});
+Route::get('tabel-kegiatan',[TabelController::class,'tabel_kegiatan']);
 
 
 Route::prefix('admin')->middleware('auth')->group( function(){

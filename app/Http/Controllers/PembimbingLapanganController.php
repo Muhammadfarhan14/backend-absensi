@@ -251,15 +251,15 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->first();
+            $mahasiswa = Mahasiswa::with('datang','pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
 
-            $hariPertamaDatang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->first();
+            $hariPertamaDatang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->get();
             if ($hariPertamaDatang) {
                 $tanggalHariPertamaDatang = Carbon::parse($hariPertamaDatang->tanggal);
                 $hariTerakhirDatang = $tanggalHariPertamaDatang->addRealDays(44);
             }
 
-            $hariPertamaPulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->first();
+            $hariPertamaPulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->get();
             if ($hariPertamaPulang) {
                 $tanggalHariPertamaPulang = Carbon::parse($hariPertamaPulang->tanggal);
                 $hariTerakhirPulang = $tanggalHariPertamaPulang->addRealDays(44);

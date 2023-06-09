@@ -88,10 +88,6 @@ class AuthController extends Controller
                     "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
                     "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
-                    // "datang" => $mahasiswa->datang,
-                    // "pulang" => $mahasiswa->pulang,
-                    // "kegiatan" => $mahasiswa->kegiatan,
-                    // "kendala" => $mahasiswa->kendala
                 ],
             ]);
         }
@@ -118,6 +114,7 @@ class AuthController extends Controller
                 "message" => "data user yang login",
                 "data" => [
                     "nama" => $dosen_pembimbing->nama,
+                    "gambar" =>$dosen_pembimbing->gambar,
                     "roles" => $user->roles,
                 ],
             ]);

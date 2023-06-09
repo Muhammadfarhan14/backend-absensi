@@ -25,6 +25,9 @@ Route::get('/', function () {
 Route::post('/', [AuthController::class,'login'])->name('login');
 
 Route::get('tabel-kegiatan',[TabelController::class,'tabel_kegiatan']);
+Route::get('tabel-kendala',[TabelController::class,'tabel_kendala']);
+Route::get('tabel-kegiatan-pdf',[TabelController::class,'kegiantanPDF']);
+Route::get('tabel-kendala-pdf',[TabelController::class,'kendalaPDF']);
 
 
 Route::prefix('admin')->middleware('auth')->group( function(){

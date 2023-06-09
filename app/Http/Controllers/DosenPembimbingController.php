@@ -109,23 +109,57 @@ class DosenPembimbingController extends Controller
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
-            $lokasi_ppl = [];
-            foreach ($mahasiswa as $key => $value) {
-                $lokasi_ppl[$key] = Lokasi::where('id', $value->lokasi_id)->first();
+            $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+            $today = Carbon::now()->format('Y-m-d');
+            foreach ($mahasiswa as $key => $item) {
+                $kendala[$key] = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->first();
             }
+            // foreach ($mahasiswa as $key => $value) {
+            //     $lokasi_ppl[$key] = Lokasi::where('id', $value->lokasi_id)->first();
+            // }
+
+            $namaTampil = array(); // Array untuk menyimpan nama yang sudah ditampilkan
+            $dataMahasiswa = array(); // Array untuk menyimpan data mahasiswa yang akan ditampilkan
+
+            foreach ($mahasiswa as $key => $value) {
+                // Periksa apakah nama sudah ditampilkan sebelumnya
+                if (!in_array($value->nama, $namaTampil)) {
+                    // Tambahkan nama ke array nama yang sudah ditampilkan
+                    $namaTampil[] = $value->nama;
+
+                    // Ambil data lokasi berdasarkan ID
+                    $lokasiPPL = Lokasi::where('id', $value->lokasi_id)->first();
+
+                    // Tambahkan data mahasiswa ke dalam array
+                    $dataMahasiswa[] = [
+                        "nama" => $value->nama,
+                        "lokasi_ppl" => $lokasiPPL,
+                    ];
+                }
+            }
+
+            $bulan = [
+                1 => 'Januari',
+                2 => 'Februari',
+                3 => 'Maret',
+                4 => 'April',
+                5 => 'Mei',
+                6 => 'Juni',
+                7 => 'Juli',
+                8 => 'Agustus',
+                9 => 'September',
+                10 => 'Oktober',
+                11 => 'November',
+                12 => 'Desember',
+            ];
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data pembimbing lapangan dan lokasi PPL",
                 "data" =>
                 [
-                    "dosen pembimbing" => $user
-                ],
-                [
-                    "lokasi" => $lokasi_ppl,
-                ],
-                [
-                    "mahasiswa" => $mahasiswa
+                    "lokasi" => $dataMahasiswa,
+                    "bulan" => $bulan,
+                    "kendala" => $kendala
                 ]
             ]);
         }

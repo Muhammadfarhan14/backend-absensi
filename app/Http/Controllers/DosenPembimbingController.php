@@ -14,6 +14,7 @@ use App\Models\Mahasiswa;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\DosenPembimbing;
+use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -112,33 +113,37 @@ class DosenPembimbingController extends Controller
             $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
 
             $lokasi_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
+            $pembimbing_lapangan_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
 
             foreach ($mahasiswa as $key => $value) {
                 $lokasi = Lokasi::where('id', $value->lokasi_id)->first();
+                $pembimbing_lapangan = PembimbingLapangan::where('id',$value->pembimbing_lapangan_id)->first();
 
-            // persentasi kehadiran
-            $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)->get();
-            $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)
-                ->whereHas('datang', function ($query) {
-                    $today = Carbon::now()->format('Y-m-d');
-                    $query->where('keterangan', 'hadir')->where('tanggal', $today);
-                })->get();
-                if($mahasiswaDatang != null){
-                    $persentasiKehadiran = ($mahasiswaDatang->count()/$jumlahMahasiswaPadaLokasiPPL->count()) * 100;
-                }else{
+                // persentasi kehadiran
+                $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)->get();
+                $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->where('lokasi_id', $lokasi->id)
+                    ->whereHas('datang', function ($query) {
+                        $today = Carbon::now()->format('Y-m-d');
+                        $query->where('keterangan', 'hadir')->where('tanggal', $today);
+                    })->get();
+                if ($mahasiswaDatang != null) {
+                    $persentasiKehadiran = ($mahasiswaDatang->count() / $jumlahMahasiswaPadaLokasiPPL->count()) * 100;
+                } else {
                     $persentasiKehadiran = 0;
                 }
 
                 // Periksa apakah lokasi sudah ditampilkan sebelumnya
-                if (!in_array($lokasi->nama, $lokasi_tampil)) {
+                if (!in_array($lokasi->nama, $lokasi_tampil) || !in_array($pembimbing_lapangan->nama,$pembimbing_lapangan_tampil)) {
                     $lokasi_ppl[] = [
                         'id' => $lokasi->id,
                         'nama' => $lokasi->nama,
                         'gambar' => $lokasi->gambar,
                         'alamat' => $lokasi->alamat,
+                        'pembimbing_lapangan' => $pembimbing_lapangan->nama,
                         "pesentasi_kehadiran" => $persentasiKehadiran
                     ];
                     $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil
+                    $pembimbing_lapangan_tampil[] = $pembimbing_lapangan->nama; // Tambahkan lokasi ke array lokasi_tampil
                 }
             }
 
@@ -178,23 +183,54 @@ class DosenPembimbingController extends Controller
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang', 'pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
-            $mhs = Mahasiswa::with('datang', 'pulang')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+
+            $tanggalHariIni = Carbon::now()->toDateString();
+            $mahasiswa = Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
+                $query->whereDate('tanggal', $tanggalHariIni);
+            }, 'pulang' => function ($query) use ($tanggalHariIni) {
+                $query->whereDate('tanggal', $tanggalHariIni);
+            }])
+                ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
+                ->get();
+            // Menghilangkan kolom created_at dan updated_at
+            $mahasiswa = $mahasiswa->makeHidden(
+                [
+                    'user_id',
+                    'lokasi_id',
+                    'pembimbing_lapangan_id',
+                    'dosen_pembimbing_id',
+                    'created_at',
+                    'updated_at',
+                ]
+            );
+            // Menghilangkan kolom created_at dan updated_at pada relasi datang
+            $mahasiswa->each(function ($item) {
+                $item->datang->makeHidden([
+                    'mahasiswa_id',
+                    'gambar',
+                    'hari_pertama',
+                     'created_at',
+                     'updated_at'
+                    ]);
+            });
+            // Menghilangkan kolom created_at dan updated_at pada relasi pulang
+            $mahasiswa->each(function ($item) {
+                $item->pulang->makeHidden([
+                    'mahasiswa_id',
+                    'gambar',
+                    'hari_pertama',
+                    'created_at',
+                    'updated_at'
+                ]);
+            });
+
+
+
+
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => [
-                    "mahasiswa" => $mahasiswa,
-                ],
-                [
-                    "lokasi" =>  $mhs->lokasi,
-                ],
-                [
-                    "pembimbing lapangan" =>  $mhs->pembimbing_lapangan->nama,
-                ],
-                [
-                    "dosen pembimbing" =>   $mhs->dosen_pembimbing->nama,
-                ]
+                "data" => $mahasiswa
             ]);
         }
         return response()->json([
@@ -241,9 +277,7 @@ class DosenPembimbingController extends Controller
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => [
-                    "mahasiswa" => $mahasiswa,
-                ],
+                "data" => $mahasiswa
             ]);
         }
         return response()->json([

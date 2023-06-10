@@ -117,11 +117,11 @@ class DosenPembimbingController extends Controller
 
             foreach ($mahasiswa as $key => $value) {
                 $lokasi = Lokasi::where('id', $value->lokasi_id)->first();
-                $pembimbing_lapangan = PembimbingLapangan::where('id',$value->pembimbing_lapangan_id)->first();
+                $pembimbing_lapangan = PembimbingLapangan::where('id', $value->pembimbing_lapangan_id)->first();
 
                 // persentasi kehadiran
                 $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)->get();
-                $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->where('lokasi_id', $lokasi->id)
+                $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('lokasi_id', $lokasi->id)
                     ->whereHas('datang', function ($query) {
                         $today = Carbon::now()->format('Y-m-d');
                         $query->where('keterangan', 'hadir')->where('tanggal', $today);
@@ -133,7 +133,7 @@ class DosenPembimbingController extends Controller
                 }
 
                 // Periksa apakah lokasi sudah ditampilkan sebelumnya
-                if (!in_array($lokasi->nama, $lokasi_tampil) || !in_array($pembimbing_lapangan->nama,$pembimbing_lapangan_tampil)) {
+                if (!in_array($lokasi->nama, $lokasi_tampil) || !in_array($pembimbing_lapangan->nama, $pembimbing_lapangan_tampil)) {
                     $lokasi_ppl[] = [
                         'id' => $lokasi->id,
                         'nama' => $lokasi->nama,
@@ -193,7 +193,7 @@ class DosenPembimbingController extends Controller
                 ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
                 ->get();
             // Menghilangkan kolom created_at dan updated_at
-            $mahasiswa = $mahasiswa->makeHidden(
+            $mahasiswa->makeHidden(
                 [
                     'user_id',
                     'lokasi_id',
@@ -209,9 +209,9 @@ class DosenPembimbingController extends Controller
                     'mahasiswa_id',
                     'gambar',
                     'hari_pertama',
-                     'created_at',
-                     'updated_at'
-                    ]);
+                    'created_at',
+                    'updated_at'
+                ]);
             });
             // Menghilangkan kolom created_at dan updated_at pada relasi pulang
             $mahasiswa->each(function ($item) {
@@ -243,19 +243,62 @@ class DosenPembimbingController extends Controller
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
-            $jam_mulai = Kegiatan::where('mahasiswa_id', $mahasiswa->id)->first();
-            $jam_selesai = Kegiatan::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
+            $today = Carbon::now()->format('Y-m-d');
+            $mahasiswa = Mahasiswa::with(['kegiatan' => function ($query) use ($today) {
+                $query->whereDate('tanggal', $today);
+            }, 'datang' => function ($query) use ($today) {
+                $query->whereDate('tanggal', $today);
+            }, 'pulang' => function ($query) use ($today) {
+                $query->whereDate('tanggal', $today);}
+            ])->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+
+            $mahasiswa->makeHidden(
+                [
+                    'user_id',
+                    'lokasi_id',
+                    'pembimbing_lapangan_id',
+                    'dosen_pembimbing_id',
+                    'created_at',
+                    'updated_at',
+                ]
+            );
+            $mahasiswa->kegiatan->makeHidden([
+                'mahasiswa_id',
+                'jam_selesai',
+                'created_at',
+                'updated_at',
+            ]);
+
+            $mahasiswa->datang->each(function ($datang) {
+                $datang->jam_datang = $datang->created_at->format('H:i'); // Format created_at menjadi jam_datang dengan format 'H:i:s'
+                $datang->makeHidden([
+                    'mahasiswa_id',
+                    'gambar',
+                    'keterangan',
+                    'tanggal',
+                    'hari_pertama',
+                    'created_at',
+                    'updated_at',
+                ]);
+            });
+
+            $mahasiswa->pulang->each(function ($pulang) {
+                $pulang->jam_pulang = $pulang->created_at->format('H:i'); // Format created_at menjadi jam_pulang dengan format 'H:i:s'
+                $pulang->makeHidden([
+                    'mahasiswa_id',
+                    'gambar',
+                    'keterangan',
+                    'tanggal',
+                    'hari_pertama',
+                    'created_at',
+                    'updated_at',
+                ]);
+            });
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
                 "data" => [
-                    "mahasiswa" => $mahasiswa,
-                ],
-                [
-                    "waktu kegiatan" =>
-                    $jam_mulai->jam_mulai,
-                    $jam_selesai->jam_selesai,
+                    $mahasiswa,
                 ]
             ]);
         }

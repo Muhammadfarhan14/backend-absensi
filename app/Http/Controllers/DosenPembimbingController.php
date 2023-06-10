@@ -127,7 +127,6 @@ class DosenPembimbingController extends Controller
                     $persentasiKehadiran = ($mahasiswaDatang->count()/$jumlahMahasiswaPadaLokasiPPL->count()) * 100;
                 }else{
                     $persentasiKehadiran = 0;
-
                 }
 
                 // Periksa apakah lokasi sudah ditampilkan sebelumnya
@@ -166,10 +165,7 @@ class DosenPembimbingController extends Controller
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data kendala menurut tanggal hari ini",
-                "data" =>
-                [
-                    "kendala" => $kendala
-                ]
+                "data" => $kendala
             ]);
         }
         return response()->json([

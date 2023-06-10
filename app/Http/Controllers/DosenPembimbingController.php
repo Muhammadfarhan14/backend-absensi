@@ -104,8 +104,38 @@ class DosenPembimbingController extends Controller
 
 
     #api dosen pembimbing
-    public function home()
+    public function home_lokasi_ppl()
     {
+        $user = Auth::user();
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+            $lokasi_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
+
+            foreach ($mahasiswa as $key => $value) {
+                $lokasi = Lokasi::where('id', $value->lokasi_id)->first();
+
+                // Periksa apakah lokasi sudah ditampilkan sebelumnya
+                if (!in_array($lokasi->nama, $lokasi_tampil)) {
+                    $lokasi_ppl[$key] = $lokasi;
+                    $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil
+                }
+            }
+
+            return response()->json([
+                "message" => "kamu berhasil mengirim data lokasi PPL",
+                "data" =>
+                [
+                    "lokasi" => $lokasi_ppl,
+                ]
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function home_kendala(){
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
@@ -114,51 +144,11 @@ class DosenPembimbingController extends Controller
             foreach ($mahasiswa as $key => $item) {
                 $kendala[$key] = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->first();
             }
-            // foreach ($mahasiswa as $key => $value) {
-            //     $lokasi_ppl[$key] = Lokasi::where('id', $value->lokasi_id)->first();
-            // }
-
-            $namaTampil = array(); // Array untuk menyimpan nama yang sudah ditampilkan
-            $dataMahasiswa = array(); // Array untuk menyimpan data mahasiswa yang akan ditampilkan
-
-            foreach ($mahasiswa as $key => $value) {
-                // Periksa apakah nama sudah ditampilkan sebelumnya
-                if (!in_array($value->nama, $namaTampil)) {
-                    // Tambahkan nama ke array nama yang sudah ditampilkan
-                    $namaTampil[] = $value->nama;
-
-                    // Ambil data lokasi berdasarkan ID
-                    $lokasiPPL = Lokasi::where('id', $value->lokasi_id)->first();
-
-                    // Tambahkan data mahasiswa ke dalam array
-                    $dataMahasiswa[] = [
-                        "nama" => $value->nama,
-                        "lokasi_ppl" => $lokasiPPL,
-                    ];
-                }
-            }
-
-            $bulan = [
-                1 => 'Januari',
-                2 => 'Februari',
-                3 => 'Maret',
-                4 => 'April',
-                5 => 'Mei',
-                6 => 'Juni',
-                7 => 'Juli',
-                8 => 'Agustus',
-                9 => 'September',
-                10 => 'Oktober',
-                11 => 'November',
-                12 => 'Desember',
-            ];
 
             return response()->json([
-                "message" => "kamu berhasil mengirim data pembimbing lapangan dan lokasi PPL",
+                "message" => "kamu berhasil mengirim data kendala menurut tanggal hari ini",
                 "data" =>
                 [
-                    "lokasi" => $dataMahasiswa,
-                    "bulan" => $bulan,
                     "kendala" => $kendala
                 ]
             ]);

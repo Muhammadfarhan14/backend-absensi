@@ -110,24 +110,42 @@ class DosenPembimbingController extends Controller
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+
             $lokasi_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
 
             foreach ($mahasiswa as $key => $value) {
                 $lokasi = Lokasi::where('id', $value->lokasi_id)->first();
 
+            // persentasi kehadiran
+            $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)->get();
+            $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)
+                ->whereHas('datang', function ($query) {
+                    $today = Carbon::now()->format('Y-m-d');
+                    $query->where('keterangan', 'hadir')->where('tanggal', $today);
+                })->get();
+                if($mahasiswaDatang != null){
+                    $persentasiKehadiran = ($mahasiswaDatang->count()/$jumlahMahasiswaPadaLokasiPPL->count()) * 100;
+                }else{
+                    $persentasiKehadiran = 0;
+
+                }
+
                 // Periksa apakah lokasi sudah ditampilkan sebelumnya
                 if (!in_array($lokasi->nama, $lokasi_tampil)) {
-                    $lokasi_ppl[$key] = $lokasi;
+                    $lokasi_ppl[] = [
+                        'id' => $lokasi->id,
+                        'nama' => $lokasi->nama,
+                        'gambar' => $lokasi->gambar,
+                        'alamat' => $lokasi->alamat,
+                        "pesentasi_kehadiran" => $persentasiKehadiran
+                    ];
                     $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil
                 }
             }
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data lokasi PPL",
-                "data" =>
-                [
-                    "lokasi" => $lokasi_ppl,
-                ]
+                "data" => $lokasi_ppl,
             ]);
         }
         return response()->json([
@@ -135,7 +153,8 @@ class DosenPembimbingController extends Controller
         ]);
     }
 
-    public function home_kendala(){
+    public function home_kendala()
+    {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();

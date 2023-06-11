@@ -82,10 +82,6 @@
         display: table;
         /* width: 20%; */
     }
-    /* .row {
-        display: table-row;
-        width: 100px;
-    } */
 
     .cell-1{
         display: table-cell;

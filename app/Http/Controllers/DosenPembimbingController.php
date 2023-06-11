@@ -318,25 +318,28 @@ class DosenPembimbingController extends Controller
         ]);
     }
 
-    public function update_kendala()
+    public function update_kendala($id)
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
-            $kendala = Kendala::where('status', false)->first();
-            $kendala->update([
-                'status' => true
-            ]);
+            Mahasiswa::with('kendala')->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+            $kendala = Kendala::where('id', $id)->where('status', false)->select('id', 'deskripsi', 'status', 'tanggal')->first();
 
-            return response()->json([
-                "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => $mahasiswa
-            ]);
+            if ($kendala) {
+                $kendala->update([
+                    'status' => true
+                ]);
+
+                return response()->json([
+                    "message" => "kamu memperbarui data kendala",
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "Kendala dengan ID ini sudah terupdate",
+                ], 404);
+            }
         }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
     }
 
     public function table_kegiatan()

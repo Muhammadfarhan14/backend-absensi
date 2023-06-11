@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>tabel kegiatan</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    {{-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"> --}}
 </head>
 
 <style>
@@ -74,32 +74,31 @@
         background-color: #f5f5f5;
     }
 
-    .kriteria-penilaian .baris {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .kriteria-penilaian ol li p {
-        width: 100px;
-    }
-
     .tanda-tangan {
         float: right;
     }
 
     .table {
         display: table;
-        width: 24%;
+        /* width: 20%; */
     }
-    .row {
+    /* .row {
         display: table-row;
-    }
-    .cell {
+        width: 100px;
+    } */
+
+    .cell-1{
         display: table-cell;
-        padding: 5px 15px;
+        padding: 10px 0;
+        width: 20px;
     }
-    .cell:first-child {
-        width: 88px;
+    .cell-2 {
+        display: table-cell;
+        padding: 10px 3px;
+        width: 80px;
+    }
+    .cell-2:first-child {
+        width: 40px;
     }
 </style>
 
@@ -183,48 +182,36 @@
             <h4 style="margin: 0 auto;">Kriteria Penilaian</h4>
         </div>
         <div class="kriteria-penilaian">
-            <ol type="I" class="class="table"">
-                <li>
-                    <div>
-                        <p class="row">Inovasi</p>
-                        <p class="row">:</p>
-                    </div>
+            <ol type="I" class="table">
+                <li class="row">
+                    <p class="cell-1">I.</p>
+                    <p class="cell-2">Inovasi</p>
+                    <p class="cell-2">:</p>
                 </li>
-                <li>
-                    <div class="table">
-                        <p>Kerjasama</p>
-                        <p>:</p>
-                    </div>
+                <li class="row">
+                    <p class="cell-1">II.</p>
+                    <p class="cell-2">Kerjasama</p>
+                    <p class="cell-2">:</p>
                 </li>
-                <li>
-                    <div class="table">
-                        <p>Disiplin</p>
-                        <p>:</p>
-                    </div>
+                <li class="row">
+                    <p class="cell">Disiplin</p>
+                    <p class="cell">:</p>
                 </li>
-                <li>
-                    <div class="table">
-                        <p>Inisiatif</p>
-                        <p>:</p>
-                    </div>
+                <li class="row">
+                    <p class="cell">Inisiatif</p>
+                    <p class="cell">:</p>
                 </li>
-                <li>
-                    <div class="table">
-                        <p>Kerajinan</p>
-                        <p>:</p>
-                    </div>
+                <li class="row">
+                    <p class="cell">Kerajinan</p>
+                    <p class="cell">:</p>
                 </li>
-                <li>
-                    <div class="baris">
-                        <p>Sikap</p>
-                        <p>:</p>
-                    </div>
+                <li class="row">
+                    <p class="cell">Sikap</p>
+                    <p class="cell">:</p>
                 </li>
-                <li style="list-style-type: none;">
-                    <div class="baris">
-                        <p>Rata - rata</p>
-                        <p>:</p>
-                    </div>
+                <li class="row" list-style-type:" none;">
+                    <p class="cell">Rata - rata</p>
+                    <p class="cell">:</p>
                 </li>
             </ol>
         </div>

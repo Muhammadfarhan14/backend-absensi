@@ -140,6 +140,7 @@ class DosenPembimbingController extends Controller
                         'gambar' => $lokasi->gambar,
                         'alamat' => $lokasi->alamat,
                         'pembimbing_lapangan' => $pembimbing_lapangan->nama,
+                        'dosen_pembimbing' => $dosen_pembimbing->nama,
                         "pesentasi_kehadiran" => $persentasiKehadiran
                     ];
                     $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil

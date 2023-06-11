@@ -216,6 +216,8 @@ class DosenPembimbingController extends Controller
             // Menghilangkan kolom created_at dan updated_at pada relasi datang
             $mahasiswa->each(function ($item) {
                 $item->datang->makeHidden([
+                    'id',
+                    'tanggal',
                     'mahasiswa_id',
                     'gambar',
                     'hari_pertama',
@@ -226,6 +228,8 @@ class DosenPembimbingController extends Controller
             // Menghilangkan kolom created_at dan updated_at pada relasi pulang
             $mahasiswa->each(function ($item) {
                 $item->pulang->makeHidden([
+                    'id',
+                    'tanggal',
                     'mahasiswa_id',
                     'gambar',
                     'hari_pertama',
@@ -233,10 +237,6 @@ class DosenPembimbingController extends Controller
                     'updated_at'
                 ]);
             });
-
-
-
-
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",

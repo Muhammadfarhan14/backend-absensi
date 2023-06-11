@@ -73,22 +73,18 @@
         background-color: #f5f5f5;
     }
 
-    .table {
-        display: table;
-        width: 24%;
+    .kriteria-penilaian .baris {
+        display: flex;
+        justify-content: space-between;
     }
 
-    .row {
-        display: table-row;
+    .kriteria-penilaian ol li p {
+        width: 100px;
     }
 
-    .cell {
-        display: table-cell;
-        padding: 5px 15px;
-    }
-
-    .cell:first-child {
-        width: 88px;
+    .tanda-tangan {
+        /* display: flex; */
+        float: right;
     }
 </style>
 
@@ -158,10 +154,10 @@
                 <ul>
                     <li style="margin-bottom:10px;">Tempat Praktek Pengalaman Lapangan : <br> PT. Kioser Teknologi
                         Indonesia </li>
-                        @php
-                            $text = "Kisaran Penilaian : 100 <= A>= 80 , 80 < B>= 60 , C < 60 ";
-                        @endphp
-                    <li>{{$text}}</li>
+                    @php
+                        $text = 'Kisaran Penilaian : 100 <= A>= 80 , 80 < B>= 60 , C < 60 ';
+                    @endphp
+                    <li>{{ $text }}</li>
                 </ul>
             </td>
         </tr>
@@ -171,33 +167,65 @@
         <div>
             <h4 style="margin: 0 auto;">Kriteria Penilaian</h4>
         </div>
+        <div class="kriteria-penilaian">
+            <ol type="I">
+                <li>
+                    <div class="baris">
+                        <p>Inovasi</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="baris">
+                        <p>Kerjasama</p>
+                        <p>:</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="baris">
+                        <p>Disiplin</p>
+                        <p>:</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="baris">
+                        <p>Inisiatif</p>
+                        <p>:</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="baris">
+                        <p>Kerajinan</p>
+                        <p>:</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="baris">
+                        <p>Sikap</p>
+                        <p>:</p>
+                    </div>
+                </li>
+                <li style="list-style-type: none;">
+                    <div class="baris">
+                        <p>Rata - rata</p>
+                        <p>:</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
 
-        <div class="table">
-            <div class="row">
-                <div class="cell">I. Inovasi</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
-            </div>
-            <div class="row">
-                <div class="cell">II. Kerjasama</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
-            </div>
-            <div class="row">
-                <div class="cell">III. Disiplin</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
-            </div>
-            <div class="row">
-                <div class="cell">IV. Inisiatif</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
-            </div>
-            <div class="row">
-                <div class="cell">V. Kerajinan</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
-            </div>
-            <div class="row">
-                <div class="cell">VI. Sikap</div>
-                <div class="cell" style="display:flex; width:20px;">: A</div>
+        <div class="tanda-tangan">
+            <div class="isi">
+                <div class="alamat">
+                    <p>Makassar, Desember 2021</p>
+                    <p>PT. Kioser Teknologi Indonesia</p>
+                </div>
+                <div class="visible-print text-center">
+                    {!! QrCode::size(100)->generate(url('/')) !!}
+                    <h4>Alfian Adyanto, S.M</h4>
+                </div>
             </div>
         </div>
+
     </div>
 
     @if (Kegiatan::count() != null)

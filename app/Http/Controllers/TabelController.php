@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use PDF;
-// use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 use App\Models\Kegiatan;
 use App\Models\Kendala;
@@ -15,7 +14,7 @@ class TabelController extends Controller
     {
         $kegiatan = Kegiatan::orderBy('tanggal','asc')->get();
 
-        return view('Admin.pages.tabke.kegiatan', ['data' => $kegiatan]);
+        return view('Admin.pages.table.kegiatan', ['data' => $kegiatan]);
     }
 
     public function tabel_kendala(){
@@ -26,10 +25,10 @@ class TabelController extends Controller
     public function kegiantanPDF()
     {
         $kegiatan = Kegiatan::orderBy('tanggal','asc')->get();
-        $pdf = PDF::loadView('Admin.pages.tabke.kegiatan',['data' => $kegiatan]);
-
+        $pdf = PDF::loadView('Admin.pages.table.kegiatan',['data' => $kegiatan]);
+        $pdf->setPaper('A4','potrait');
         $today = Carbon::now()->format('YmdHis');
-        return $pdf->download("tabel_kegiatan_{$today}.pdf");
+        return $pdf->stream("tabel_kegiatan_{$today}.pdf");
     }
     public function kendalaPDF()
     {

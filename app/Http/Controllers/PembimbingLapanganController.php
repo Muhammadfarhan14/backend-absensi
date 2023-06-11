@@ -251,34 +251,54 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('datang','pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
+            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
+                $query->where('hari_pertama', true);
+            }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
 
-            $hariPertamaDatang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->get();
-            if ($hariPertamaDatang) {
-                $tanggalHariPertamaDatang = Carbon::parse($hariPertamaDatang->tanggal);
-                $hariTerakhirDatang = $tanggalHariPertamaDatang->addRealDays(44);
-            }
+            $mahasiswa->makeHidden([
+                'user_id',
+                'lokasi_id',
+                'gambar',
+                'pembimbing_lapangan_id',
+                'dosen_pembimbing_id',
+                'created_at',
+                'updated_at',
+            ]);
 
-            $hariPertamaPulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('hari_pertama', true)->get();
-            if ($hariPertamaPulang) {
-                $tanggalHariPertamaPulang = Carbon::parse($hariPertamaPulang->tanggal);
-                $hariTerakhirPulang = $tanggalHariPertamaPulang->addRealDays(44);
-            }
+            foreach ($mahasiswa as $mhs) {
+                $jumlahMahasiswa = $mhs->count();
+                foreach ($mhs->pulang as $pulang) {
+                    $tanggalHariPertama = Carbon::parse($pulang->tanggal);
+                    $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
+                    $pulang->tanggal_hari_pertama = $pulang->tanggal;
+                    $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
 
-            $today = Carbon::now()->format('Y-m-d');
-            if ($hariTerakhirDatang <= $today && $hariTerakhirPulang <= $today) {
-                $muncul = true;
-                return response()->json([
-                    "message" => "hari ini sudah hari ke 45",
-                    "data" => $muncul
-                ]);
-            } else {
-                $muncul = false;
-                return response()->json([
-                    "message" => "hari ini belum mencapai hari ke 45",
-                    "data" => $muncul
-                ]);
+                    $pulang->makeHidden([
+                        'id',
+                        'mahasiswa_id',
+                        'gambar',
+                        'keterangan',
+                        'tanggal',
+                        'hari_pertama',
+                        'created_at',
+                        'updated_at',
+                    ]);
+
+                    $today = Carbon::now()->format('Y-m-d');
+                    $pulang->check45Hari = false;
+                    $checkHadirPadaHariKe45 = $pulang->where('tanggal', 'LIKE', '%' . $tanggal45HariKedepan . '%')->where('keterangan', 'hadir')->count();
+                    if ($checkHadirPadaHariKe45 == $jumlahMahasiswa && $today == $pulang->tanggal_45_hari_kedepan) {
+                        $pulang->check45Hari = true;
+                    } else
+                    if ($today >= $pulang->tanggal_45_hari_kedepan) {
+                        $pulang->check45Hari = true;
+                    }
+                }
             }
+            return response()->json([
+                "message" => "hari ini adalah hari ke 45",
+                "data" => $pulang
+            ]);
         }
     }
     #end api pembimbing lapangan

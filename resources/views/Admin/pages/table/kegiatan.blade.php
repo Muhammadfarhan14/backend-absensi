@@ -83,7 +83,6 @@
     }
 
     .tanda-tangan {
-        /* display: flex; */
         float: right;
     }
 </style>
@@ -220,7 +219,7 @@
                     <p>PT. Kioser Teknologi Indonesia</p>
                 </div>
                 <div class="visible-print text-center">
-                    {!! QrCode::size(100)->generate(url('/')) !!}
+                    {!! QrCode::size(100)->format('png')->generate(url('/')) !!}
                     <h4>Alfian Adyanto, S.M</h4>
                 </div>
             </div>
@@ -228,7 +227,7 @@
 
     </div>
 
-    @if (Kegiatan::count() != null)
+    {{-- @if (Kegiatan::count() != null)
         <h4 style="margin: 5px auto;">
             Laporan Kegiatan:
         </h4>
@@ -269,7 +268,7 @@
                 @endforeach
             </tbody>
         </table>
-    @endif
+    @endif --}}
 </body>
 
 </html>

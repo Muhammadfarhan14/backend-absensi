@@ -164,12 +164,19 @@ class DosenPembimbingController extends Controller
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
             $today = Carbon::now()->format('Y-m-d');
+            $kendala = [];
+
             foreach ($mahasiswa as $key => $item) {
-                $kendala[$key] = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->first();
+                $kendalaData = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->first();
+
+                // Cek apakah tanggal kendala sama dengan tanggal hari ini
+                if ($kendalaData && $kendalaData->tanggal == $today) {
+                    $kendala[$key] = $kendalaData;
+                }
             }
 
             return response()->json([
-                "message" => "kamu berhasil mengirim data kendala menurut tanggal hari ini",
+                "message" => "Kamu berhasil mengirim data kendala menurut tanggal hari ini",
                 "data" => $kendala
             ]);
         }

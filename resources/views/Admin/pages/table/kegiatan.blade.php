@@ -86,6 +86,21 @@
     .tanda-tangan {
         float: right;
     }
+
+    .table {
+        display: table;
+        width: 24%;
+    }
+    .row {
+        display: table-row;
+    }
+    .cell {
+        display: table-cell;
+        padding: 5px 15px;
+    }
+    .cell:first-child {
+        width: 88px;
+    }
 </style>
 
 <body>
@@ -168,32 +183,33 @@
             <h4 style="margin: 0 auto;">Kriteria Penilaian</h4>
         </div>
         <div class="kriteria-penilaian">
-            <ol type="I">
+            <ol type="I" class="class="table"">
                 <li>
-                    <div class="baris">
-                        <p>Inovasi</p>
+                    <div>
+                        <p class="row">Inovasi</p>
+                        <p class="row">:</p>
                     </div>
                 </li>
                 <li>
-                    <div class="baris">
+                    <div class="table">
                         <p>Kerjasama</p>
                         <p>:</p>
                     </div>
                 </li>
                 <li>
-                    <div class="baris">
+                    <div class="table">
                         <p>Disiplin</p>
                         <p>:</p>
                     </div>
                 </li>
                 <li>
-                    <div class="baris">
+                    <div class="table">
                         <p>Inisiatif</p>
                         <p>:</p>
                     </div>
                 </li>
                 <li>
-                    <div class="baris">
+                    <div class="table">
                         <p>Kerajinan</p>
                         <p>:</p>
                     </div>

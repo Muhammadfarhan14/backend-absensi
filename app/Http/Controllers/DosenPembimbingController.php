@@ -187,13 +187,13 @@ class DosenPembimbingController extends Controller
         ]);
     }
 
-    public function detail_lokasi_ppl()
+    public function detail_lokasi_ppl(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
 
-            $tanggalHariIni = Carbon::now()->toDateString();
+            $tanggalHariIni = $request->tanggal;
             $mahasiswa = Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
                 $query->whereDate('tanggal', $tanggalHariIni);
             }, 'pulang' => function ($query) use ($tanggalHariIni) {
@@ -201,6 +201,7 @@ class DosenPembimbingController extends Controller
             }])
                 ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
                 ->get();
+
             // Menghilangkan kolom created_at dan updated_at
             $mahasiswa->makeHidden(
                 [

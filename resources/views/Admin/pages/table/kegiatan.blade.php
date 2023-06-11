@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>tabel kegiatan</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 
 <style>
@@ -219,7 +220,7 @@
                     <p>PT. Kioser Teknologi Indonesia</p>
                 </div>
                 <div class="visible-print text-center">
-                    {!! QrCode::size(100)->format('png')->generate(url('/')) !!}
+                    <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(100)->generate(url('/'))) !!} ">
                     <h4>Alfian Adyanto, S.M</h4>
                 </div>
             </div>

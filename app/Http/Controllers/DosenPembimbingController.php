@@ -167,14 +167,16 @@ class DosenPembimbingController extends Controller
             $kendala = [];
 
             foreach ($mahasiswa as $key => $item) {
-                $kendalaData = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->first();
+                $lokasi = Lokasi::where('id', $item->lokasi_id)->select('nama', 'alamat')->first();
+                $kendalaData = Kendala::where('mahasiswa_id', $item->id)->where('tanggal', $today)->where('status', 0)->select('id', 'deskripsi', 'status', 'tanggal')->first();
 
                 // Cek apakah tanggal kendala sama dengan tanggal hari ini
                 if ($kendalaData && $kendalaData->tanggal == $today) {
-                    $kendala[$key] = $kendalaData;
+                    $kendala[$key]['nama'] = $lokasi->nama;
+                    $kendala[$key]['alamat'] = $lokasi->alamat;
+                    $kendala[$key]['kendala'] = $kendalaData;
                 }
             }
-
             return response()->json([
                 "message" => "Kamu berhasil mengirim data kendala menurut tanggal hari ini",
                 "data" => $kendala

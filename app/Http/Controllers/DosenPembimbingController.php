@@ -199,86 +199,26 @@ class DosenPembimbingController extends Controller
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-
-            $tanggalHariIni = $request->tanggal;
-            $mahasiswa = Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
-                $query->whereDate('tanggal', $tanggalHariIni);
-            }, 'pulang' => function ($query) use ($tanggalHariIni) {
-                $query->whereDate('tanggal', $tanggalHariIni);
-            }])
-                ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                ->get();
-
-            // Menghilangkan kolom created_at dan updated_at
-            $mahasiswa->makeHidden(
-                [
-                    'user_id',
-                    'lokasi_id',
-                    'pembimbing_lapangan_id',
-                    'dosen_pembimbing_id',
-                    'created_at',
-                    'updated_at',
-                ]
-            );
-            // Menghilangkan kolom created_at dan updated_at pada relasi datang
-            $mahasiswa->each(function ($item) {
-                $item->datang->makeHidden([
-                    'id',
-                    'tanggal',
-                    'mahasiswa_id',
-                    'gambar',
-                    'hari_pertama',
-                    'created_at',
-                    'updated_at'
-                ]);
-            });
-            // Menghilangkan kolom created_at dan updated_at pada relasi pulang
-            $mahasiswa->each(function ($item) {
-                $item->pulang->makeHidden([
-                    'id',
-                    'tanggal',
-                    'mahasiswa_id',
-                    'gambar',
-                    'hari_pertama',
-                    'created_at',
-                    'updated_at'
-                ]);
-            });
-
-            return response()->json([
-                "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => $mahasiswa
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
-    }
-
-    public function detail_mahasiswa()
-    {
-        $user = Auth::user();
-        if ($user->roles == 'dosen_pembimbing') {
-            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $today = Carbon::now()->format('Y-m-d');
+            $today = $request->tanggal;
             $mahasiswa = Mahasiswa::with(['kegiatan' => function ($query) use ($today) {
                 $query->whereDate('tanggal', $today);
             }, 'datang' => function ($query) use ($today) {
                 $query->whereDate('tanggal', $today);
             }, 'pulang' => function ($query) use ($today) {
-                $query->whereDate('tanggal', $today);}
-            ])->where('dosen_pembimbing_id', $dosen_pembimbing->id)->first();
+                $query->whereDate('tanggal', $today);
+            }])
+                ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
+                ->first();
 
-            $mahasiswa->makeHidden(
-                [
-                    'user_id',
-                    'lokasi_id',
-                    'pembimbing_lapangan_id',
-                    'dosen_pembimbing_id',
-                    'created_at',
-                    'updated_at',
-                ]
-            );
+            $mahasiswa->makeHidden([
+                'user_id',
+                'lokasi_id',
+                'pembimbing_lapangan_id',
+                'dosen_pembimbing_id',
+                'created_at',
+                'updated_at',
+            ]);
+
             $mahasiswa->kegiatan->makeHidden([
                 'mahasiswa_id',
                 'jam_selesai',
@@ -290,26 +230,36 @@ class DosenPembimbingController extends Controller
                 $datang->jam_datang = $datang->created_at->format('H:i'); // Format created_at menjadi jam_datang dengan format 'H:i:s'
                 $datang->makeHidden([
                     'mahasiswa_id',
-                    'gambar',
-                    'keterangan',
                     'tanggal',
                     'hari_pertama',
                     'created_at',
                     'updated_at',
                 ]);
+                // Periksa kolom yang berpotensi bernilai null
+                if ($datang->gambar === null) {
+                    $datang->gambar = ""; // Ubah nilai null menjadi string kosong
+                }
+                if ($datang->keterangan === null) {
+                    $datang->keterangan = ""; // Ubah nilai null menjadi string kosong
+                }
             });
 
             $mahasiswa->pulang->each(function ($pulang) {
                 $pulang->jam_pulang = $pulang->created_at->format('H:i'); // Format created_at menjadi jam_pulang dengan format 'H:i:s'
                 $pulang->makeHidden([
                     'mahasiswa_id',
-                    'gambar',
-                    'keterangan',
                     'tanggal',
                     'hari_pertama',
                     'created_at',
                     'updated_at',
                 ]);
+                // Periksa kolom yang berpotensi bernilai null
+                if ($pulang->gambar === null) {
+                    $pulang->gambar = ""; // Ubah nilai null menjadi string kosong
+                }
+                if ($pulang->keterangan === null) {
+                    $pulang->keterangan = ""; // Ubah nilai null menjadi string kosong
+                }
             });
 
             return response()->json([
@@ -319,6 +269,7 @@ class DosenPembimbingController extends Controller
                 ]
             ]);
         }
+
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
@@ -346,10 +297,6 @@ class DosenPembimbingController extends Controller
                 ], 404);
             }
         }
-    }
-
-    public function table_kegiatan()
-    {
     }
 
     #end dosen pembimbing

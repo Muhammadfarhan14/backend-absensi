@@ -24,10 +24,6 @@ Route::get('/', function () {
 })->name('login.web');
 Route::post('/', [AuthController::class,'login'])->name('login');
 
-Route::get('tabel-kegiatan/{id}',[TabelController::class,'tabel_kegiatan']);
-Route::get('seluruh-tabel-kegiatan/{id}',[TabelController::class,'semuaKegianPDF']);
-Route::get('tabel-kegiatan-pdf/{id}',[TabelController::class,'kegiantanPDF']);
-
 Route::prefix('admin')->middleware('auth')->group( function(){
     Route::get('/dashboard', function () {
         return view('Admin.pages.dashboard.index');

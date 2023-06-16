@@ -389,4 +389,56 @@ class MahasiswaController extends Controller
             "message" => "kamu gagal mengirim data"
         ]);
     }
+
+    public function check_hari_ke_45()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
+                $query->where('hari_pertama', true);
+            }])->where('user_id',$user->id)->first();
+
+            $mahasiswa->makeHidden([
+                'user_id',
+                'lokasi_id',
+                'gambar',
+                'pembimbing_lapangan_id',
+                'dosen_pembimbing_id',
+                'created_at',
+                'updated_at',
+            ]);
+
+            foreach ($mahasiswa->pulang as $pulang) {
+                $tanggalHariPertama = Carbon::parse($pulang->tanggal);
+                $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
+                $pulang->tanggal_hari_pertama = $pulang->tanggal;
+                $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
+                $pulang->makeHidden([
+                    'id',
+                    'mahasiswa_id',
+                    'gambar',
+                    'keterangan',
+                    'tanggal',
+                    'hari_pertama',
+                    'created_at',
+                    'updated_at',
+                ]);
+
+                $today = Carbon::now()->format('Y-m-d');
+                $pulang->check45Hari = false;
+                $checkHadirPadaHariKe45 = $pulang->where('tanggal', $tanggal45HariKedepan)->where('keterangan', 'hadir')->first();
+                if ($checkHadirPadaHariKe45) {
+                    $pulang->check45Hari = true;
+                } else
+                if ($today > $pulang->tanggal_45_hari_kedepan) {
+                    $pulang->check45Hari = true;
+                }
+            }
+
+            return response()->json([
+                "message" => "hari ini adalah hari ke 45",
+                "data" => $mahasiswa->pulang
+            ]);
+        }
+    }
 }

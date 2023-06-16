@@ -290,7 +290,7 @@ class PembimbingLapanganController extends Controller
                     if ($checkHadirPadaHariKe45 == $jumlahMahasiswa && $today == $pulang->tanggal_45_hari_kedepan) {
                         $pulang->check45Hari = true;
                     } else
-                    if ($today >= $pulang->tanggal_45_hari_kedepan) {
+                    if ($today > $pulang->tanggal_45_hari_kedepan) {
                         $pulang->check45Hari = true;
                     }
                 }

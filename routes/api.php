@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DosenPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PembimbingLapanganController;
+use App\Http\Controllers\TabelController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,9 @@ Route::get('me',[AuthController::class,'me'])->middleware('auth:sanctum')->name(
 #mahasiswa
 Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
     Route::get('show', [MahasiswaController::class, 'show'])->name('mahasiswa.show');
+
+    Route::get('check_hari_ke_45',[MahasiswaController::class,'check_hari_ke_45']);
+    Route::get('kegiatanPDF',[TabelController::class,'kegiatanPDF']);
 
     // datang
     Route::prefix('datang')->group(function () {
@@ -83,7 +87,6 @@ Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('home_lokasi_ppl',[DosenPembimbingController::class,'home_lokasi_ppl']);
     Route::get('home_kendala',[DosenPembimbingController::class,'home_kendala']);
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
-    Route::get('detail_mahasiswa',[DosenPembimbingController::class,'detail_mahasiswa']);
     Route::put('update_kendala/{id}',[DosenPembimbingController::class,'update_kendala']);
 });
 #end dosen pembimbing

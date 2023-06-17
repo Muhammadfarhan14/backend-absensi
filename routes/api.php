@@ -95,6 +95,8 @@ Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
     Route::put('update_kendala/{id}',[DosenPembimbingController::class,'update_kendala']);
 
+    // check hari ke 45
+    Route::get('check_hari_ke_45',[DosenPembimbingController::class,'check_hari_ke_45']);
     // generate PDF
     Route::get('semuaKegianPDF',[TabelController::class,'semuaKegianPDF']);
 });

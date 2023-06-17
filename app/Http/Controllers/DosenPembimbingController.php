@@ -298,6 +298,62 @@ class DosenPembimbingController extends Controller
         }
     }
 
+    public function check_hari_ke_45()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
+                $query->where('hari_pertama', true);
+            }])->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+
+            $mahasiswa->makeHidden([
+                'user_id',
+                'lokasi_id',
+                'gambar',
+                'pembimbing_lapangan_id',
+                'dosen_pembimbing_id',
+                'created_at',
+                'updated_at',
+            ]);
+
+            foreach ($mahasiswa as $mhs) {
+                $jumlahMahasiswa = $mhs->count();
+                foreach ($mhs->pulang as $pulang) {
+                    $tanggalHariPertama = Carbon::parse($pulang->tanggal);
+                    $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
+                    $pulang->tanggal_hari_pertama = $pulang->tanggal;
+                    $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
+
+                    $pulang->makeHidden([
+                        'id',
+                        'mahasiswa_id',
+                        'gambar',
+                        'keterangan',
+                        'tanggal',
+                        'hari_pertama',
+                        'created_at',
+                        'updated_at',
+                    ]);
+
+                    $today = Carbon::now()->format('Y-m-d');
+                    $pulang->check45Hari = false;
+                    $checkHadirPadaHariKe45 = $pulang->where('tanggal', 'LIKE', '%' . $tanggal45HariKedepan . '%')->where('keterangan', 'hadir')->count();
+                    if ($checkHadirPadaHariKe45 == $jumlahMahasiswa && $today == $pulang->tanggal_45_hari_kedepan) {
+                        $pulang->check45Hari = true;
+                    } else
+                    if ($today > $pulang->tanggal_45_hari_kedepan) {
+                        $pulang->check45Hari = true;
+                    }
+                }
+            }
+            return response()->json([
+                "message" => "hari ini adalah hari ke 45",
+                "data" => $pulang
+            ]);
+        }
+    }
+
     #end dosen pembimbing
 
 }

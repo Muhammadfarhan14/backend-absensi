@@ -59,15 +59,7 @@ class TabelController extends Controller
             $pdf->setPaper('A4', 'portrait');
             $fileName = "tabel_kegiatan_ppl_dosen_{$dosen_pembimbing->nama}.pdf";
 
-            $pdf->stream($fileName);
-            // dd($stream);
-
-            // return response()->json([
-            //     "message" => "link generate PDF",
-            //     "data" => $stream
-            // ]);
-
-            // return $pdf->stream($fileName);
+            return $pdf->stream($fileName);
         }
     }
 }

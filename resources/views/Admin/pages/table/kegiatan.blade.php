@@ -216,7 +216,7 @@
                         <td>Makassar, {{ Carbon::now()->isoFormat('D MMMM YYYY') }}</span></td>
                     </tr>
                     <tr>
-                        <td>PT. Kioser Teknologi Indonesia</td>
+                        <td>{{$mahasiswa->lokasi->nama}}</td>
                     </tr>
                     <tr>
                         <td>
@@ -226,7 +226,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><b>Alfian Adyanto, S.M</b></td>
+                        <td><b>{{$mahasiswa->pembimbing_lapangan->nama}}</b></td>
                     </tr>
                 </table>
             </div>
@@ -239,9 +239,18 @@
                 Rincian Kegiatan
             </h3>
         </div>
+        @php
+        $hariPertama = $mahasiswa->pulang->where('hari_pertama', true)->first();
+        if ($hariPertama) {
+            $tanggalHariPertama = Carbon::parse($hariPertama->tanggal);
+            $formatHariPertama = Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM');
+            $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->isoFormat('D MMMM YYYY');
+        }
+    @endphp
         <div class="text-center" style="margin: 10px 0;text-transform:uppercase;">
             <h3 style="margin: 0 0;">Laporan kegiatan</h3>
-            <h4 style="margin: 10px 0 5px;">Periode Tanggal 28 Juni – s.d. 3 Juli  2020</h4>
+            <h4 style="margin: 10px 0 5px;">Periode Tanggal {{ $formatHariPertama }} - s.d
+                {{ $tanggal45HariKedepan }}</h4>
             <table style="margin: 0 0;">
                 <tr>
                     <td style="height: 25px;">Jurusan/Prodi</td>

@@ -300,6 +300,50 @@ class PembimbingLapanganController extends Controller
                 "data" => $pulang
             ]);
         }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function select_mahasiswa_kriteria_penilaian()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'pembimbing_lapangan') {
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->select('id','nama','nim','gambar')->get();
+
+            return response()->json([
+                "message" => "kamu berhasil mengirim data",
+                "data" => $mahasiswa
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
+    }
+
+    public function kriteria_penilaian(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->roles == 'pembimbing_lapangan') {
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->where('id',$request->id)->first();
+            KriteriaPenilaian::create([
+                'mahasiswa_id' => $mahasiswa->id,
+                'inovasi' => $request->inovasi,
+                'kerja_sama' => $request->kerja_sama,
+                'disiplin' => $request->disiplin,
+                'inisiatif' => $request->inisiatif,
+                'sikap' => $request->sikap,
+            ]);
+
+            return response()->json([
+                "message" => "kamu berhasil menambahkan kriteria penilaian"
+            ]);
+        }
+        return response()->json([
+            "message" => "kamu gagal mengirim data"
+        ]);
     }
     #end api pembimbing lapangan
 }

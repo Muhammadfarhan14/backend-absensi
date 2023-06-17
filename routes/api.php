@@ -79,6 +79,9 @@ Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function
     // check hari ke 45
     Route::get('check_hari_ke_45',[PembimbingLapanganController::class,'check_hari_ke_45']);
 
+    // select mahasiswa
+    Route::get('select_mahasiswa_kriteria_penilaian',[PembimbingLapanganController::class,'select_mahasiswa_kriteria_penilaian']);
+
 });
 #end pembimbing lapangan
 

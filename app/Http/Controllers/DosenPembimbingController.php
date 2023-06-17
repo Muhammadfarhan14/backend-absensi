@@ -208,7 +208,7 @@ class DosenPembimbingController extends Controller
                 $query->whereDate('tanggal', $today);
             }])
                 ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                ->first();
+                ->get();
 
             $mahasiswa->makeHidden([
                 'user_id',
@@ -219,54 +219,53 @@ class DosenPembimbingController extends Controller
                 'updated_at',
             ]);
 
-            $mahasiswa->kegiatan->makeHidden([
-                'mahasiswa_id',
-                'jam_selesai',
-                'created_at',
-                'updated_at',
-            ]);
+            $mahasiswa->each(function ($mahasiswa) {
 
-            $mahasiswa->datang->each(function ($datang) {
-                $datang->jam_datang = $datang->created_at->format('H:i'); // Format created_at menjadi jam_datang dengan format 'H:i:s'
-                $datang->makeHidden([
-                    'mahasiswa_id',
+                $mahasiswa->gambar = $mahasiswa->gambar ?? "";
+                $mahasiswa->pdf = $mahasiswa->pdf ?? "";
+                $mahasiswa->kegiatan->makeHidden([
+                    'tanggal',
+                    'hari_pertama',
+                    'jam_selesai',
+                    'created_at',
+                    'updated_at',
+
+                ]);
+
+                $mahasiswa->datang->each(function ($datang) {
+                    $datang->tanggal = $datang->tanggal ?? "";
+                    $datang->hari_pertama = $datang->hari_pertama ?? "";
+                    $datang->keterangan = $datang->keterangan ?? "";
+                    $datang->gambar = $datang->gambar ?? "";
+                    $datang->created_at = $datang->created_at ?? "";
+                    $datang->updated_at = $datang->updated_at ?? "";
+                });
+                $mahasiswa->datang->makeHidden([
                     'tanggal',
                     'hari_pertama',
                     'created_at',
                     'updated_at',
                 ]);
-                // Periksa kolom yang berpotensi bernilai null
-                if ($datang->gambar === null) {
-                    $datang->gambar = ""; // Ubah nilai null menjadi string kosong
-                }
-                if ($datang->keterangan === null) {
-                    $datang->keterangan = ""; // Ubah nilai null menjadi string kosong
-                }
-            });
 
-            $mahasiswa->pulang->each(function ($pulang) {
-                $pulang->jam_pulang = $pulang->created_at->format('H:i'); // Format created_at menjadi jam_pulang dengan format 'H:i:s'
-                $pulang->makeHidden([
-                    'mahasiswa_id',
+                $mahasiswa->pulang->each(function ($pulang) {
+                    $pulang->tanggal = $pulang->tanggal ?? "";
+                    $pulang->hari_pertama = $pulang->hari_pertama ?? "";
+                    $pulang->keterangan = $pulang->keterangan ?? "";
+                    $pulang->gambar = $pulang->gambar ?? "";
+                    $pulang->created_at = $pulang->created_at ?? "";
+                    $pulang->updated_at = $pulang->updated_at ?? "";
+                });
+                $mahasiswa->pulang->makeHidden([
                     'tanggal',
                     'hari_pertama',
                     'created_at',
                     'updated_at',
                 ]);
-                // Periksa kolom yang berpotensi bernilai null
-                if ($pulang->gambar === null) {
-                    $pulang->gambar = ""; // Ubah nilai null menjadi string kosong
-                }
-                if ($pulang->keterangan === null) {
-                    $pulang->keterangan = ""; // Ubah nilai null menjadi string kosong
-                }
             });
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => [
-                    $mahasiswa,
-                ]
+                "data" => $mahasiswa
             ]);
         }
 

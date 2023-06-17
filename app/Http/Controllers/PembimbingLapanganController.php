@@ -310,13 +310,27 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->select('id','nama','nim','gambar')->get();
+            $mahasiswa = Mahasiswa::with('kriteria_penilaian')
+                ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
+                ->select('id', 'nama', 'nim', 'gambar')
+                ->get();
+
+            $mahasiswa->each(function ($mahasiswa) {
+                $status = $mahasiswa->kriteria_penilaian ? 1 : 0;
+                $mahasiswa->status = $status;
+                $mahasiswa->makeHidden('kriteria_penilaian');
+
+                if ($mahasiswa->gambar === null) {
+                    $mahasiswa->gambar = ""; // Mengganti nilai null dengan string kosong
+                }
+            });
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data",
                 "data" => $mahasiswa
             ]);
         }
+        
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);
@@ -334,6 +348,7 @@ class PembimbingLapanganController extends Controller
                 'kerja_sama' => $request->kerja_sama,
                 'disiplin' => $request->disiplin,
                 'inisiatif' => $request->inisiatif,
+                'kerajinan' => $request->kerajinan,
                 'sikap' => $request->sikap,
             ]);
 

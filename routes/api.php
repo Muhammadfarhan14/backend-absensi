@@ -82,6 +82,9 @@ Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function
     // select mahasiswa
     Route::get('select_mahasiswa_kriteria_penilaian',[PembimbingLapanganController::class,'select_mahasiswa_kriteria_penilaian']);
 
+    // input kriteria penilaian
+    Route::post('kriteria_penilaian',[PembimbingLapanganController::class,'kriteria_penilaian']);
+
 });
 #end pembimbing lapangan
 
@@ -91,5 +94,8 @@ Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('home_kendala',[DosenPembimbingController::class,'home_kendala']);
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
     Route::put('update_kendala/{id}',[DosenPembimbingController::class,'update_kendala']);
+
+    // generate PDF
+    Route::get('semuaKegianPDF',[TabelController::class,'semuaKegianPDF']);
 });
 #end dosen pembimbing

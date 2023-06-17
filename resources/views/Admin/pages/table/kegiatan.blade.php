@@ -86,8 +86,8 @@
     }
 
     .page-break {
-    page-break-after: always;
-}
+        page-break-after: always;
+    }
 </style>
 
 <body>
@@ -98,8 +98,9 @@
     <div class="page-1">
         <table style="margin: 0 auto; width:100%;text-align: center;">
             <tr>
-                <td width="20%"> <img src="{{url('https://rekreartive.com/wp-content/uploads/2019/03/Logo-UIN-Alauddin-Makassar-Warna.jpg')}}" width="70%"
-                        alt="">
+                <td width="20%"> <img
+                        src="{{ url('https://rekreartive.com/wp-content/uploads/2019/03/Logo-UIN-Alauddin-Makassar-Warna.jpg') }}"
+                        width="70%" alt="">
                 </td>
                 <td>
                     <table style="margin: 0 auto; width:100%;text-align: center;">
@@ -146,8 +147,8 @@
                         </tr>
                         <tr>
                             <td>1</td>
-                            <td>{{$mahasiswa->nim}}</td>
-                            <td>{{$mahasiswa->nama}}</td>
+                            <td>{{ $mahasiswa->nim }}</td>
+                            <td>{{ $mahasiswa->nama }}</td>
                         </tr>
                     </table>
                 </td>
@@ -156,9 +157,9 @@
                 <td>
                     <ul>
                         <li style="margin-bottom:10px;">Tempat Praktek Pengalaman Lapangan : <br>
-                        {{$mahasiswa->lokasi->nama}} </li>
+                            {{ $mahasiswa->lokasi->nama }} </li>
                         @php
-                            $text = 'Kisaran Penilaian : 100 <= A>= 80 , 80 < B>= 60 , C < 60 ';
+                            $text = 'Kisaran Penilaian : 100 <= A >= 80 , 80 < B >= 60 , C < 60 ';
                         @endphp
                         <li>{{ $text }}</li>
                     </ul>
@@ -171,41 +172,78 @@
                 <h4 style="margin: 0 auto;">Kriteria Penilaian</h4>
             </div>
             <div class="kriteria-penilaian">
+
+                @php
+                    $nilaiMap = [
+                        4 => 'A',
+                        3 => 'B',
+                        2 => 'C',
+                        1 => 'D',
+                    ];
+
+                    $inovasi = '';
+                    $kerja_sama = '';
+                    $disiplin = '';
+                    $inisiatif = '';
+                    $kerajinan = '';
+                    $sikap = '';
+
+                    if ($mahasiswa->kriteria_penilaian) {
+                        $inovasi = $nilaiMap[$mahasiswa->kriteria_penilaian->inovasi] ?? '';
+                        $kerja_sama = $nilaiMap[$mahasiswa->kriteria_penilaian->kerja_sama] ?? '';
+                        $disiplin = $nilaiMap[$mahasiswa->kriteria_penilaian->disiplin] ?? '';
+                        $inisiatif = $nilaiMap[$mahasiswa->kriteria_penilaian->inisiatif] ?? '';
+                        $kerajinan = $nilaiMap[$mahasiswa->kriteria_penilaian->kerajinan] ?? '';
+                        $sikap = $nilaiMap[$mahasiswa->kriteria_penilaian->sikap] ?? '';
+                    }
+                    $total = '';
+                    $rata2 = (collect($mahasiswa->kriteria_penilaian)->only(['inovasi', 'kerja_sama', 'disiplin', 'inisiatif', 'kerajinan', 'sikap'])->sum() / 24) * 100;
+                    if($rata2 >= 80 && $rata2 <= 100){
+                        $total = 'A';
+                    }elseif( $rata2 >= 60 && $rata2 < 80 ){
+                        $total = 'B';
+                    }elseif($rata < 60){
+                        $total = 'C';
+                    }elseif($total == 0){
+                        $total = 'E';
+                    }
+                @endphp
+
                 <table>
                     <tr>
                         <td class="no">I.</td>
                         <td>Inovasi</td>
-                        <td>:</td>
+                        <td>: {{ $inovasi }}</td>
                     </tr>
                     <tr>
                         <td class="no">II.</td>
                         <td>Kerjasama</td>
-                        <td>:</td>
+                        <td>: {{$kerja_sama}}</td>
                     </tr>
                     <tr>
                         <td class="no">III.</td>
                         <td>Disiplin</td>
-                        <td>:</td>
+                        <td>: {{$disiplin}}</td>
                     </tr>
                     <tr>
                         <td class="no">IV.</td>
                         <td>Inisiatif</td>
-                        <td>:</td>
+                        <td>: {{$inisiatif}}</td>
                     </tr>
                     <tr>
                         <td class="no">V.</td>
                         <td>Kerajinan</td>
-                        <td>:</td>
+                        <td>: {{$kerajinan}}</td>
                     </tr>
                     <tr>
                         <td class="no">VI.</td>
                         <td>Sikap</td>
-                        <td>:</td>
+                        <td>: {{$sikap}}</td>
                     </tr>
                     <tr>
                         <td class="no"></td>
                         <td>Rata - rata</td>
-                        <td>:</td>
+                        <td>: {{$total}}</td>
                     </tr>
                 </table>
             </div>
@@ -216,17 +254,17 @@
                         <td>Makassar, {{ Carbon::now()->isoFormat('D MMMM YYYY') }}</span></td>
                     </tr>
                     <tr>
-                        <td>{{$mahasiswa->lokasi->nama}}</td>
+                        <td>{{ $mahasiswa->lokasi->nama }}</td>
                     </tr>
                     <tr>
                         <td>
                             <img src="data:image/png;base64, {!! base64_encode(
-                                QrCode::format('png')->size(100)->generate(url("{$mahasiswa->pdf}"))
+                                QrCode::format('png')->size(100)->generate(url("{$mahasiswa->pdf}")),
                             ) !!}" alt="QR Code">
                         </td>
                     </tr>
                     <tr>
-                        <td><b>{{$mahasiswa->pembimbing_lapangan->nama}}</b></td>
+                        <td><b>{{ $mahasiswa->pembimbing_lapangan->nama }}</b></td>
                     </tr>
                 </table>
             </div>
@@ -240,13 +278,13 @@
             </h3>
         </div>
         @php
-        $hariPertama = $mahasiswa->pulang->where('hari_pertama', true)->first();
-        if ($hariPertama) {
-            $tanggalHariPertama = Carbon::parse($hariPertama->tanggal);
-            $formatHariPertama = Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM');
-            $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->isoFormat('D MMMM YYYY');
-        }
-    @endphp
+            $hariPertama = $mahasiswa->pulang->where('hari_pertama', true)->first();
+            if ($hariPertama) {
+                $tanggalHariPertama = Carbon::parse($hariPertama->tanggal);
+                $formatHariPertama = Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM');
+                $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->isoFormat('D MMMM YYYY');
+            }
+        @endphp
         <div class="text-center" style="margin: 10px 0;text-transform:uppercase;">
             <h3 style="margin: 0 0;">Laporan kegiatan</h3>
             <h4 style="margin: 10px 0 5px;">Periode Tanggal {{ $formatHariPertama }} - s.d

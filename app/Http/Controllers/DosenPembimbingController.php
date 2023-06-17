@@ -237,7 +237,7 @@ class DosenPembimbingController extends Controller
                     $datang->hari_pertama = $datang->hari_pertama ?? "";
                     $datang->keterangan = $datang->keterangan ?? "";
                     $datang->gambar = $datang->gambar ?? "";
-                    $datang->created_at = $datang->created_at ?? "";
+                    $datang->jam_datang = $datang->created_at ? $datang->created_at->format('H:i') : "";
                     $datang->updated_at = $datang->updated_at ?? "";
                 });
                 $mahasiswa->datang->makeHidden([
@@ -252,7 +252,7 @@ class DosenPembimbingController extends Controller
                     $pulang->hari_pertama = $pulang->hari_pertama ?? "";
                     $pulang->keterangan = $pulang->keterangan ?? "";
                     $pulang->gambar = $pulang->gambar ?? "";
-                    $pulang->created_at = $pulang->created_at ?? "";
+                    $pulang->jam_pulang = $pulang->created_at ? $pulang->created_at->format('H:i') : "";
                     $pulang->updated_at = $pulang->updated_at ?? "";
                 });
                 $mahasiswa->pulang->makeHidden([

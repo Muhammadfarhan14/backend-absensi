@@ -49,14 +49,25 @@ class TabelController extends Controller
         ]);
     }
 
-    public function semuaKegianPDF($id)
+    public function semuaKegianPDF()
     {
-        $dosen_pembimbing = DosenPembimbing::where('id', $id)->first();
-        $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->whereNotNull('pdf')->get();
-        $pdf = PDF::loadView('Admin.pages.table.seluruh-kegiatan-mahasiswa', ['mahasiswa' => $mahasiswa]);
-        $pdf->setPaper('A4', 'portrait');
-        $fileName = "tabel_kegiatan_ppl_dosen_{$dosen_pembimbing->nama}.pdf";
+        $user = Auth::user();
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+            $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->whereNotNull('pdf')->get();
+            $pdf = PDF::loadView('Admin.pages.table.seluruh-kegiatan-mahasiswa', ['mahasiswa' => $mahasiswa]);
+            $pdf->setPaper('A4', 'portrait');
+            $fileName = "tabel_kegiatan_ppl_dosen_{$dosen_pembimbing->nama}.pdf";
 
-        return $pdf->stream($fileName);
+            $pdf->stream($fileName);
+            // dd($stream);
+
+            // return response()->json([
+            //     "message" => "link generate PDF",
+            //     "data" => $stream
+            // ]);
+
+            // return $pdf->stream($fileName);
+        }
     }
 }

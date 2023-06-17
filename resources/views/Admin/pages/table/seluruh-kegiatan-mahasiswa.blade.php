@@ -175,42 +175,80 @@
                 <div>
                     <h4 style="margin: 0 auto;">Kriteria Penilaian</h4>
                 </div>
+
+                @php
+                $nilaiMap = [
+                    4 => 'A',
+                    3 => 'B',
+                    2 => 'C',
+                    1 => 'D',
+                ];
+
+                $inovasi = '';
+                $kerja_sama = '';
+                $disiplin = '';
+                $inisiatif = '';
+                $kerajinan = '';
+                $sikap = '';
+
+                if ($item->kriteria_penilaian) {
+                    $inovasi = $nilaiMap[$item->kriteria_penilaian->inovasi] ?? '';
+                    $kerja_sama = $nilaiMap[$item->kriteria_penilaian->kerja_sama] ?? '';
+                    $disiplin = $nilaiMap[$item->kriteria_penilaian->disiplin] ?? '';
+                    $inisiatif = $nilaiMap[$item->kriteria_penilaian->inisiatif] ?? '';
+                    $kerajinan = $nilaiMap[$item->kriteria_penilaian->kerajinan] ?? '';
+                    $sikap = $nilaiMap[$item->kriteria_penilaian->sikap] ?? '';
+                }
+
+                $rata2 = (collect($item->kriteria_penilaian)->only(['inovasi', 'kerja_sama', 'disiplin', 'inisiatif', 'kerajinan', 'sikap'])->sum() / 24) * 100;
+                $total = '';
+                if($rata2 >= 80 && $rata2 <= 100){
+                        $total = 'A';
+                    }elseif( $rata2 >= 60 && $rata2 < 80 ){
+                        $total = 'B';
+                    }elseif($rata < 60){
+                        $total = 'C';
+                    }elseif($total == 0){
+                        $total = 'E';
+                    }
+            @endphp
+
                 <div class="kriteria-penilaian">
                     <table>
                         <tr>
                             <td class="no">I.</td>
                             <td>Inovasi</td>
-                            <td>:</td>
+                            <td>: {{$inovasi}}</td>
                         </tr>
                         <tr>
                             <td class="no">II.</td>
                             <td>Kerjasama</td>
-                            <td>:</td>
+                            <td>: {{$kerja_sama}}</td>
                         </tr>
                         <tr>
                             <td class="no">III.</td>
                             <td>Disiplin</td>
-                            <td>:</td>
+                            <td>: {{$disiplin}}</td>
                         </tr>
                         <tr>
                             <td class="no">IV.</td>
                             <td>Inisiatif</td>
-                            <td>:</td>
+                            <td>: {{$inisiatif}}</td>
                         </tr>
                         <tr>
                             <td class="no">V.</td>
                             <td>Kerajinan</td>
-                            <td>:</td>
+                            <td>: {{$kerajinan}}</td>
                         </tr>
                         <tr>
                             <td class="no">VI.</td>
                             <td>Sikap</td>
-                            <td>:</td>
+                            <td>: {{$sikap}}</td>
                         </tr>
                         <tr>
                             <td class="no"></td>
                             <td>Rata - rata</td>
-                            <td>:</td>
+                            <td>: {{$total}}</td>
                         </tr>
                     </table>
                 </div>

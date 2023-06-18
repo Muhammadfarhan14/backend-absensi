@@ -241,7 +241,6 @@ class DosenPembimbingController extends Controller
                     $datang->updated_at = $datang->updated_at ?? "";
                 });
                 $mahasiswa->datang->makeHidden([
-                    'tanggal',
                     'hari_pertama',
                     'created_at',
                     'updated_at',

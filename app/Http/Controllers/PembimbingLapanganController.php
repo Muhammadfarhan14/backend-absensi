@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PembimbingLapanganRequest;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Datang;
-use App\Models\KriteriaPenilaian;
+use App\Models\Lokasi;
 use App\Models\Pulang;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
+use App\Models\KriteriaPenilaian;
 use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
+use App\Http\Requests\PembimbingLapanganRequest;
 
 class PembimbingLapanganController extends Controller
 {
@@ -312,8 +313,20 @@ class PembimbingLapanganController extends Controller
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::with('kriteria_penilaian')
                 ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
-                ->select('id', 'nama', 'nim', 'gambar')
+                ->select('id', 'nama', 'nim', 'gambar', 'lokasi_id')
                 ->get();
+
+            foreach ($mahasiswa as $mhs) {
+                $lokasi = Lokasi::where('id', $mhs->lokasi_id)->first();
+                $mhs->lokasi = $lokasi;
+
+                $mhs->lokasi->makeHidden([
+                    'created_at',
+                    'updated_at',
+                ]);
+
+                $mhs->makeHidden('lokasi_id');
+            }
 
             $mahasiswa->each(function ($mahasiswa) {
                 $status = $mahasiswa->kriteria_penilaian ? 1 : 0;
@@ -330,7 +343,7 @@ class PembimbingLapanganController extends Controller
                 "data" => $mahasiswa
             ]);
         }
-        
+
         return response()->json([
             "message" => "kamu gagal mengirim data"
         ]);

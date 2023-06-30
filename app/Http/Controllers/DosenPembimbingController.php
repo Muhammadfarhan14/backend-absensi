@@ -200,6 +200,7 @@ class DosenPembimbingController extends Controller
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $today = $request->tanggal;
+            $lokasi_id = $request->lokasi_id;
             $mahasiswa = Mahasiswa::with(['kegiatan' => function ($query) use ($today) {
                 $query->whereDate('tanggal', $today);
             }, 'datang' => function ($query) use ($today) {
@@ -208,7 +209,11 @@ class DosenPembimbingController extends Controller
                 $query->whereDate('tanggal', $today);
             }])
                 ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                ->get();
+                ->where('lokasi_id',$lokasi_id)->get();
+
+            foreach($mahasiswa as $mhs){
+                $lokasi = Lokasi::where('id',$mhs->lokasi_id)->first();
+            }
 
             $mahasiswa->makeHidden([
                 'user_id',

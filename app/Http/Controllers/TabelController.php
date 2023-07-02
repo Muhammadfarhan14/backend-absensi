@@ -27,9 +27,16 @@ class TabelController extends Controller
             $nama = Str::slug($mahasiswa->nama, '_'); // Mengganti spasi dengan tanda -
             $fileName = "tabel_kegiatan_ppl_{$nama}.pdf";
             $baseURL = url('/') . '/pdf/' . $fileName;
-            if ($mahasiswa->where('pdf', null)) {
-                $mahasiswa->update([
-                    'pdf' => $baseURL
+            if($mahasiswa->kriteria_penilaian){
+                if ($mahasiswa->where('pdf', null)) {
+                    $mahasiswa->update([
+                        'pdf' => $baseURL
+                    ]);
+                }
+            }else{
+                return response()->json([
+                    "message" => "url file kegiatan pdf mahasiswa masih kosong",
+                    "data" => ""
                 ]);
             }
             $pdf = PDF::loadView('Admin.pages.table.kegiatan', ['mahasiswa' => $mahasiswa, 'data' => $kegiatan]);
@@ -77,7 +84,7 @@ class TabelController extends Controller
                         "message" => "url file kegiatan pdf mahasiswa pada dosen pembimbing",
                         "data" => $dosen_pembimbing->pdf
                     ]);
-                }else{
+                } else {
                     return response()->json([
                         "message" => "file sudah tersedia",
                         "data" => $dosen_pembimbing->pdf
@@ -86,10 +93,9 @@ class TabelController extends Controller
             } else {
                 return response()->json([
                     "message" => "masih ada mahasiswa yang belum generate file kegiatan ppl",
-                    "data" => null
+                    "data" => ""
                 ]);
             }
         }
-
     }
 }

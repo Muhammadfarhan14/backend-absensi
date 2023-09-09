@@ -99,7 +99,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
             if ($mahasiswa) {
                 return response()->json([
                     "message" => "kamu berhasil presensi datang",
@@ -122,7 +122,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
 
             return response()->json([
                 "message" => "kamu berhasil cek data mahasiswa",
@@ -140,7 +140,7 @@ class PembimbingLapanganController extends Controller
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
             $tanggalHariIni = Carbon::now()->toDateString();
-            $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
 
             $datang = Datang::get();
             $today = Carbon::now()->format('Y-m-d');
@@ -173,7 +173,7 @@ class PembimbingLapanganController extends Controller
                 "data" => [
                     Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
                         $query->whereDate('tanggal', $tanggalHariIni);
-                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
+                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first()
                 ],
             ]);
         }
@@ -187,7 +187,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
             if ($mahasiswa) {
                 return response()->json([
                     "message" => "kamu berhasil presensi pulang",
@@ -209,7 +209,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengirim data mahasiswa",
@@ -226,7 +226,7 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first();
+            $mahasiswa = Mahasiswa::with('pulang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
             $tanggalHariIni = Carbon::now()->toDateString();
             $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
             $pulang->update([
@@ -238,7 +238,7 @@ class PembimbingLapanganController extends Controller
                 "data" => [
                     Mahasiswa::with(['pulang' => function ($query) use ($tanggalHariIni) {
                         $query->whereDate('tanggal', $tanggalHariIni);
-                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('nim', $request->nim)->first()
+                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first()
                 ]
             ]);
         }

@@ -81,6 +81,7 @@ class AuthController extends Controller
             return response()->json([
                 "message" => "data user yang login",
                 "data" => [
+                    "id_PPL" => $mahasiswa->id_PPL,
                     "nama" => $mahasiswa->nama,
                     "nim" => $mahasiswa->nim,
                     "gambar" => $mahasiswa->gambar,

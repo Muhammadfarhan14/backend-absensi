@@ -25,7 +25,7 @@ class UpdateMahasiswaRequest extends FormRequest
     {
         return [
             'nama' => 'required',
-            'nim' => 'required|unique:mahasiswas',
+            'nim' => 'required',
             'password' => 'required',
             'lokasi_id' => 'required',
             'pembimbing_lapangan_id' => 'required',

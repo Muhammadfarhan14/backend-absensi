@@ -47,9 +47,12 @@ class MahasiswaController extends Controller
     public function store(MahasiswaRequest $request)
     {
 
+        $idPPL = "PPL". str_pad(Mahasiswa::max('id')+1,STR_PAD_LEFT);
+
         $mhs = new Mahasiswa();
         $mhs->nama = $request->nama;
         $mhs->nim = $request->nim;
+        $mhs->id_PPL = $idPPL;
         $mhs->lokasi_id = $request->lokasi_id;
         $mhs->dosen_pembimbing_id = $request->dosen_pembimbing_id;
         $mhs->pembimbing_lapangan_id = $request->pembimbing_lapangan_id;
@@ -63,7 +66,7 @@ class MahasiswaController extends Controller
         $mhs->save();
 
         $user = new User();
-        $user->username = $mhs->nim;
+        $user->username = $mhs->id_PPL;
         $user->nama = $mhs->nama;
         $user->password = Hash::make($request->password);
         $user->roles = "mahasiswa";
@@ -106,7 +109,6 @@ class MahasiswaController extends Controller
                 'gambar' => $profileImage,
             ]);
             $user->update([
-                'username' => $mhs->nim,
                 'nama' => $mhs->nama,
                 'password' => Hash::make($request->password),
             ]);
@@ -119,7 +121,6 @@ class MahasiswaController extends Controller
                 'pembimbing_lapangan_id' => $request->pembimbing_lapangan_id,
             ]);
             $user->update([
-                'username' => $mhs->nim,
                 'nama' => $mhs->nama,
                 'password' => Hash::make($request->password),
             ]);

@@ -34,6 +34,7 @@ use App\Models\Lokasi;
                                 <th>No.</th>
                                 <th>Nama</th>
                                 <th>Nim</th>
+                                <th>Username</th>
                                 <th>Tempat PPL</th>
                                 <th>Aksi</th>
                             </tr>
@@ -44,6 +45,7 @@ use App\Models\Lokasi;
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->nim }}</td>
+                                <td>{{ $item->id_PPL }}</td>
                                 <td>{{ $item->lokasi->nama }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal"

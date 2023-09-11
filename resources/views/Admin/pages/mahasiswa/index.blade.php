@@ -31,10 +31,9 @@ use App\Models\Lokasi;
                     <table class="datatables-users table border-top" id="mahasiswa">
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th>ID</th>
                                 <th>Nama</th>
                                 <th>Nim</th>
-                                <th>Username</th>
                                 <th>Tempat PPL</th>
                                 <th>Aksi</th>
                             </tr>
@@ -42,10 +41,9 @@ use App\Models\Lokasi;
                         <tbody>
                             @foreach ($mhs as $item)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $item->id_PPL }}</td>
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->nim }}</td>
-                                <td>{{ $item->id_PPL }}</td>
                                 <td>{{ $item->lokasi->nama }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal"

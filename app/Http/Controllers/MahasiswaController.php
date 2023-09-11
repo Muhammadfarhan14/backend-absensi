@@ -66,7 +66,7 @@ class MahasiswaController extends Controller
         $mhs->save();
 
         $user = new User();
-        $user->username = $mhs->id_PPL;
+        $user->username = $mhs->nim;
         $user->nama = $mhs->nama;
         $user->password = Hash::make($request->password);
         $user->roles = "mahasiswa";
@@ -110,6 +110,7 @@ class MahasiswaController extends Controller
             ]);
             $user->update([
                 'nama' => $mhs->nama,
+                'username' => $mhs->nim,
                 'password' => Hash::make($request->password),
             ]);
         } else {
@@ -122,6 +123,7 @@ class MahasiswaController extends Controller
             ]);
             $user->update([
                 'nama' => $mhs->nama,
+                'username' => $mhs->nim,
                 'password' => Hash::make($request->password),
             ]);
         }

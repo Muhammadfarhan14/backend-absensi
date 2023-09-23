@@ -47,12 +47,10 @@ class MahasiswaController extends Controller
     public function store(MahasiswaRequest $request)
     {
 
-        $idPPL = "PPL". str_pad(Mahasiswa::max('id')+1,STR_PAD_LEFT);
-
         $mhs = new Mahasiswa();
         $mhs->nama = $request->nama;
         $mhs->nim = $request->nim;
-        $mhs->id_PPL = $idPPL;
+        $mhs->id_PPL = mt_rand(10000, 99999);
         $mhs->lokasi_id = $request->lokasi_id;
         $mhs->dosen_pembimbing_id = $request->dosen_pembimbing_id;
         $mhs->pembimbing_lapangan_id = $request->pembimbing_lapangan_id;

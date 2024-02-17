@@ -47,7 +47,7 @@
          <li class="menu-item {{ $title == 'Authentication' ? 'active' : '' }}">
              <a href="{{ route('authentication.index') }}" class="menu-link">
                 <i class='menu-icon bx bx-log-in'></i>
-                 <div data-i18n="Analytics">authentication</div>
+                 <div data-i18n="Analytics">Authentication</div>
              </a>
          </li>
          <li class="menu-header small text-uppercase">

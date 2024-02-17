@@ -14,4 +14,11 @@ class Kendala extends Model
     {
         return $this->belongsTo(Mahasiswa::class);
     }
+
+    public function komen()
+    {
+        return $this->hasMany(Komen::class);
+    }
+
+
 }

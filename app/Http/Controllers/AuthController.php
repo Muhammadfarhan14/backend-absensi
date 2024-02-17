@@ -2,18 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\AuthToken;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\DosenPembimbing;
 use App\Models\PembimbingLapangan;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+
+    public function index()
+    {
+        $today = Carbon::now()->format('Y-m-d');
+        $token = AuthToken::where('tanggal',$today)->where('name','!=','admin')->get();
+        return view('Admin.pages.authentication.index',compact('token'));
+    }
+
+    public function destroy($id)
+    {
+        $token = AuthToken::find($id);
+        $token->delete();
+
+        return redirect()->back();
+    }
+
     #logout
     public function logout(Request $request)
     {
@@ -24,10 +42,14 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout_web(Request $request)
+    public function logout_web()
     {
-        $request->session()->flush();
-        Auth::user()->tokens()->delete();
+        $user = Auth::user();
+        $token = AuthToken::where('name',$user->username)->get();
+        foreach ($token as $item) {
+            $item->delete();
+        }
+
         Auth::logout();
         return redirect()->route('login.web');
     }
@@ -86,6 +108,7 @@ class AuthController extends Controller
                     "nim" => $mahasiswa->nim,
                     "gambar" => $mahasiswa->gambar,
                     "roles" => $user->roles,
+                    "keterangan" => $mahasiswa->keterangan,
                     "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
                     "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
@@ -102,6 +125,7 @@ class AuthController extends Controller
                     "message" => "data user yang login",
                     "data" => [
                         "nama_pembimbing_lapangan" => $pembimbing_lapangan->nama,
+                        "keterangan_pembimbing_lapangan" => $pembimbing_lapangan->keterangan,
                         "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama ,
                         "roles" => $user->roles,
                         "lokasi" => $item->lokasi

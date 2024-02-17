@@ -99,7 +99,7 @@
         <table style="margin: 0 auto; width:100%;text-align: center;">
             <tr>
                 <td width="20%"> <img
-                        src="{{ url('https://rekreartive.com/wp-content/uploads/2019/03/Logo-UIN-Alauddin-Makassar-Warna.jpg') }}"
+                        src="{{ url('https://i0.wp.com/ypmic.or.id/wp-content/uploads/2020/09/logo-uin-png.png?ssl=1') }}"
                         width="70%" alt="">
                 </td>
                 <td>
@@ -197,14 +197,19 @@
                         $sikap = $nilaiMap[$mahasiswa->kriteria_penilaian->sikap] ?? '';
                     }
                     $total = '';
-                    $rata2 = (collect($mahasiswa->kriteria_penilaian)->only(['inovasi', 'kerja_sama', 'disiplin', 'inisiatif', 'kerajinan', 'sikap'])->sum() / 24) * 100;
-                    if($rata2 >= 80 && $rata2 <= 100){
+                    $rata2 =
+                        (collect($mahasiswa->kriteria_penilaian)
+                            ->only(['inovasi', 'kerja_sama', 'disiplin', 'inisiatif', 'kerajinan', 'sikap'])
+                            ->sum() /
+                            24) *
+                        100;
+                    if ($rata2 >= 80 && $rata2 <= 100) {
                         $total = 'A';
-                    }elseif( $rata2 >= 60 && $rata2 < 80 ){
+                    } elseif ($rata2 >= 60 && $rata2 < 80) {
                         $total = 'B';
-                    }elseif($rata < 60){
+                    } elseif ($rata < 60) {
                         $total = 'C';
-                    }elseif($total == 0){
+                    } elseif ($total == 0) {
                         $total = 'E';
                     }
                 @endphp
@@ -218,32 +223,32 @@
                     <tr>
                         <td class="no">II.</td>
                         <td>Kerjasama</td>
-                        <td>: {{$kerja_sama}}</td>
+                        <td>: {{ $kerja_sama }}</td>
                     </tr>
                     <tr>
                         <td class="no">III.</td>
                         <td>Disiplin</td>
-                        <td>: {{$disiplin}}</td>
+                        <td>: {{ $disiplin }}</td>
                     </tr>
                     <tr>
                         <td class="no">IV.</td>
                         <td>Inisiatif</td>
-                        <td>: {{$inisiatif}}</td>
+                        <td>: {{ $inisiatif }}</td>
                     </tr>
                     <tr>
                         <td class="no">V.</td>
                         <td>Kerajinan</td>
-                        <td>: {{$kerajinan}}</td>
+                        <td>: {{ $kerajinan }}</td>
                     </tr>
                     <tr>
                         <td class="no">VI.</td>
                         <td>Sikap</td>
-                        <td>: {{$sikap}}</td>
+                        <td>: {{ $sikap }}</td>
                     </tr>
                     <tr>
                         <td class="no"></td>
                         <td>Rata - rata</td>
-                        <td>: {{$total}}</td>
+                        <td>: {{ $total }}</td>
                     </tr>
                 </table>
             </div>
@@ -277,18 +282,12 @@
                 Rincian Kegiatan
             </h3>
         </div>
-        @php
-            $hariPertama = $mahasiswa->pulang->where('hari_pertama', true)->first();
-            if ($hariPertama) {
-                $tanggalHariPertama = Carbon::parse($hariPertama->tanggal);
-                $formatHariPertama = Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM');
-                $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->isoFormat('D MMMM YYYY');
-            }
-        @endphp
+
         <div class="text-center" style="margin: 10px 0;text-transform:uppercase;">
             <h3 style="margin: 0 0;">Laporan kegiatan</h3>
-            <h4 style="margin: 10px 0 5px;">Periode Tanggal {{ $formatHariPertama }} - s.d
-                {{ $tanggal45HariKedepan }}</h4>
+            <h4 style="margin: 10px 0 5px;">Periode Tanggal
+                {{ Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM') }} - s.d
+                {{ Carbon::parse($hariTerakhir->tanggal)->isoFormat('D MMMM YYYY') }}</h4>
             <table style="margin: 0 0;">
                 <tr>
                     <td style="height: 25px;">Jurusan/Prodi</td>

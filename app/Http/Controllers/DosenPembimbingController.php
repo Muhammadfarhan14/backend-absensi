@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DosenPembimbingRequest;
-use App\Http\Requests\UpdateDosenPembimbingRequest;
-use App\Models\Kegiatan;
-use App\Models\Kendala;
+use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Datang;
+use App\Models\Komen;
 use App\Models\Lokasi;
-use App\Models\Pulang;
+use App\Models\Kendala;
 use App\Models\Mahasiswa;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -17,7 +14,8 @@ use App\Models\DosenPembimbing;
 use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
+use App\Http\Requests\DosenPembimbingRequest;
+use App\Http\Requests\UpdateDosenPembimbingRequest;
 
 class DosenPembimbingController extends Controller
 {
@@ -193,6 +191,97 @@ class DosenPembimbingController extends Controller
             "message" => "kamu gagal mengirim data"
         ]);
     }
+    public function home_komen()
+    {
+        $user = Auth::user();
+
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+
+            if ($dosen_pembimbing) {
+                $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->select('id','lokasi_id','nama','nim')->get();
+                $today = Carbon::now()->format('Y-m-d');
+                $komentarData = [];
+
+                foreach ($mahasiswa as $key => $item) {
+                    $lokasi = Lokasi::where('id', $item->lokasi_id)->select('id','nama')->first();
+
+                    if ($lokasi) {
+                        $kendala = Kendala::where('mahasiswa_id', $item->id)
+                            ->where('tanggal', $today)
+                            ->where('status', 1)
+                            ->first();
+
+                        if ($kendala) {
+                            $komen = Komen::where('kendala_id', $kendala->id)->latest()->first();
+                            $komen->makeHidden([
+                                'created_at',
+                                'updated_at'
+                            ]);
+
+                            $komentarData[] =
+                            [
+                                'mahasiswa' => $item->toArray(),
+                                'lokasi' => $lokasi->toArray(),
+                                'komen' => $komen ? $komen->toArray() : ""
+                            ];
+                        }
+                    }
+                }
+
+                return response()->json([
+                    "message" => "Data Komen berhasil diambil untuk tanggal hari ini",
+                    "data" => $komentarData
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "Dosen pembimbing tidak ditemukan"
+                ], 404);
+            }
+        }
+
+        return response()->json([
+            "message" => "Akses ditolak"
+        ], 403);
+    }
+
+    public function home_kendala_true(Request $request)
+    {
+        $user = Auth::user();
+        $kendala_id = $request->kendala_id;
+
+        if ($user->roles == 'dosen_pembimbing') {
+            $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+
+            if ($dosen_pembimbing) {
+                $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
+                $today = Carbon::now()->format('Y-m-d');
+                $kendalaData = [];
+
+                foreach ($mahasiswa as $key => $item) {
+                    $kendala = Kendala::where('mahasiswa_id', $item->id)
+                        ->where('tanggal', $today)
+                        ->where('status', 1)
+                        ->first();
+
+                    $kendalaData = $kendala ? $kendala->toArray() : "";
+                }
+
+                return response()->json([
+                    "message" => "Data kendala berhasil diambil untuk tanggal hari ini dengan status true",
+                    "data" => $kendalaData
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "Dosen pembimbing tidak ditemukan"
+                ], 404);
+            }
+        }
+
+        return response()->json([
+            "message" => "Akses ditolak"
+        ], 403);
+    }
 
     public function detail_lokasi_ppl(Request $request)
     {
@@ -209,10 +298,10 @@ class DosenPembimbingController extends Controller
                 $query->whereDate('tanggal', $today);
             }])
                 ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                ->where('lokasi_id',$lokasi_id)->get();
+                ->where('lokasi_id', $lokasi_id)->get();
 
-            foreach($mahasiswa as $mhs){
-                $lokasi = Lokasi::where('id',$mhs->lokasi_id)->first();
+            foreach ($mahasiswa as $mhs) {
+                $lokasi = Lokasi::where('id', $mhs->lokasi_id)->first();
             }
 
             $mahasiswa->makeHidden([
@@ -302,59 +391,42 @@ class DosenPembimbingController extends Controller
         }
     }
 
-    public function check_hari_ke_45()
+    public function tabel_rekaputulasi(Request $request)
     {
         $user = Auth::user();
+
         if ($user->roles == 'dosen_pembimbing') {
+
+            $lokasi_id = $request->lokasi_id;
+
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
-                $query->where('hari_pertama', true);
-            }])->where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
-
-            $mahasiswa->makeHidden([
-                'user_id',
-                'lokasi_id',
-                'gambar',
-                'pembimbing_lapangan_id',
-                'dosen_pembimbing_id',
-                'created_at',
-                'updated_at',
-            ]);
-
-            foreach ($mahasiswa as $mhs) {
-                $jumlahMahasiswa = $mhs->count();
-                foreach ($mhs->pulang as $pulang) {
-                    $tanggalHariPertama = Carbon::parse($pulang->tanggal);
-                    $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
-                    $pulang->tanggal_hari_pertama = $pulang->tanggal;
-                    $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
-
-                    $pulang->makeHidden([
-                        'id',
-                        'mahasiswa_id',
-                        'gambar',
-                        'keterangan',
-                        'tanggal',
-                        'hari_pertama',
-                        'created_at',
-                        'updated_at',
-                    ]);
-
-                    $today = Carbon::now()->format('Y-m-d');
-                    $pulang->check45Hari = false;
-                    $checkHadirPadaHariKe45 = $pulang->where('tanggal', 'LIKE', '%' . $tanggal45HariKedepan . '%')->where('keterangan', 'hadir')->count();
-                    if ($checkHadirPadaHariKe45 == $jumlahMahasiswa && $today == $pulang->tanggal_45_hari_kedepan) {
-                        $pulang->check45Hari = true;
-                    } else
-                    if ($today > $pulang->tanggal_45_hari_kedepan) {
-                        $pulang->check45Hari = true;
-                    }
+            $mahasiswa = Mahasiswa::with([
+                'kegiatan' => function ($query) {
+                    $query->select('id', 'mahasiswa_id', 'deskripsi', 'jam_mulai', 'jam_selesai', 'tanggal');
+                },
+                'kriteria_penilaian' => function ($query) {
+                    $query->select('id', 'mahasiswa_id', 'inovasi', 'kerja_sama', 'disiplin', 'inisiatif', 'kerajinan', 'sikap');
+                },
+                'pembimbing_lapangan' => function ($query) {
+                    $query->select('id', 'nama');
+                },
+                'pulang' => function ($query) {
+                    // Tambahkan kolom 'tanggal' pada metode select untuk dapat menggunakan min dan max
+                    $query->select('mahasiswa_id', 'tanggal');
                 }
-            }
-            return response()->json([
-                "message" => "hari ini adalah hari ke 45",
-                "data" => $pulang
-            ]);
+            ])
+                ->select('id', 'pembimbing_lapangan_id', 'lokasi_id', 'nim', 'nama') // Batasi kolom yang diambil dari tabel 'mahasiswa'
+                ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
+                ->where('lokasi_id', $lokasi_id)
+                ->get();
+
+            // Tambahkan data tanggal hari pertama dan hari terakhir ke setiap objek mahasiswa
+            $mahasiswa->each(function ($mahasiswa) {
+                $mahasiswa->tanggal_hari_pertama = $mahasiswa->pulang->min('tanggal');
+                $mahasiswa->tanggal_hari_terakhir = $mahasiswa->pulang->max('tanggal');
+            });
+
+            return view('Admin.pages.table.kegiatan-per-hari', compact('mahasiswa'));
         }
     }
 

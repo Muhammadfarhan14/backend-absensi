@@ -149,41 +149,76 @@ class MahasiswaController extends Controller
 
     ##api##
 
-    //datang
-    public function datang_action(Request $request)
+    // datang
+    // public function datang_action(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     if ($user->roles == 'mahasiswa') {
+
+    //         $this->validate($request, [
+    //             'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+    //         ]);
+
+    //         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+    //         $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
+    //         if ($request->gambar) {
+    //             $foto = $request->file('gambar');
+    //             $destinationPath = 'images/';
+    //             $baseURL = url('/');
+    //             $profileImage = $baseURL . '/images/' . Str::slug($mahasiswa->nama) . "-datang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+    //             $foto->move($destinationPath, $profileImage);
+
+    //             $datang->update([
+    //                 "keterangan" => "hadir",
+    //                 'gambar' => $profileImage
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             "messagge" => "kamu berhasil tambah gambar datang",
+    //             "data" => [
+    //                 Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
+    //             ]
+    //         ]);
+    //     }
+    //     return response()->json([
+    //         "message" => "kamu gagal mengirim data"
+    //     ]);
+    // }
+
+    public function update_gambar(Request $request)
     {
         $user = Auth::user();
+
         if ($user->roles == 'mahasiswa') {
 
-            $this->validate($request, [
-                'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-            ]);
 
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
-            if ($request->gambar) {
+
+            if ($request->hasFile('gambar')) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
                 $baseURL = url('/');
                 $profileImage = $baseURL . '/images/' . Str::slug($mahasiswa->nama) . "-datang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
-
+                $datang = Datang::where('mahasiswa_id',$mahasiswa->id)->latest()->first();
                 $datang->update([
-                    "keterangan" => "hadir",
                     'gambar' => $profileImage
                 ]);
+                return response()->json([
+                    "message" => "Kamu berhasil menambahkan gambar datang",
+                    "data" => $datang
+                ]);
+            }else{
+                return response()->json([
+                    "message" => "File gambar tidak ditemukan."
+                ]);
             }
-
+        }else{
             return response()->json([
-                "messagge" => "kamu berhasil tambah gambar datang",
-                "data" => [
-                    Datang::where('mahasiswa_id', $mahasiswa->id)->latest()->first()
-                ]
+                "message" => "ini bukan akun mahasiswa"
             ]);
         }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
     }
 
     public function detail_datang_by_tanggal()
@@ -192,7 +227,13 @@ class MahasiswaController extends Controller
         if ($user->roles == 'mahasiswa') {
             $today = Carbon::now()->format('Y-m-d');
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+            $datang = Datang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $today)->latest()->first();
+
+            $datang->each(function ($datang) {
+                if ($datang->gambar === null) {
+                    $datang->gambar = ""; // Mengganti nilai null dengan string kosong
+                }
+            });
 
             return response()->json([
                 "message" => "kamu berhasil mengambil data datang hari ini",
@@ -215,12 +256,10 @@ class MahasiswaController extends Controller
             $kendala = Kendala::get();
             $today = Carbon::now()->format('Y-m-d');
             foreach ($kendala as $item) {
-                if($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id){
+                if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
                     return response()->json([
                         "message" => "data kendala hari ini sudah ada",
-                        "data" => [
-                           null
-                        ]
+                        "data" => ""
                     ]);
                 }
             }
@@ -235,7 +274,7 @@ class MahasiswaController extends Controller
             return response()->json([
                 "message" => "kamu berhasil membuat deskripsi kendala",
                 "data" => [
-                    Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->latest()->first()
+                    Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $tanggalHariIni)->latest()->first()
                 ]
             ]);
         }
@@ -250,7 +289,7 @@ class MahasiswaController extends Controller
         if ($user->roles == 'mahasiswa') {
             $today = Carbon::now()->format('Y-m-d');
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $kendala = Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+            $kendala = Kendala::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $today)->latest()->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengambil data kendala hari ini",
@@ -268,59 +307,45 @@ class MahasiswaController extends Controller
     public function pulang_action(Request $request)
     {
         $user = Auth::user();
+
         if ($user->roles == 'mahasiswa') {
+            // Validasi gambar
             $this->validate($request, [
                 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
             ]);
 
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
-            if ($request->gambar) {
+            // Periksa apakah ada file gambar di-upload
+            if ($request->hasFile('gambar')) {
                 $foto = $request->file('gambar');
                 $destinationPath = 'images/';
                 $baseURL = url('/');
                 $profileImage = $baseURL . '/images/' . Str::slug($mahasiswa->nama) . "-pulang" . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
                 $foto->move($destinationPath, $profileImage);
 
-                $pulang = Pulang::get();
-                $today = Carbon::now()->format('Y-m-d');
-                foreach ($pulang as $item) {
-                    if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
-                        return response()->json([
-                            "messagge" => "data pulang hari ini sudah ada",
-                            "data" => [ null ]
-                        ]);
-                    }
-                }
+                $tanggalHariIni = Carbon::now()->toDateString();
 
-                $cekHariPertama = Pulang::where('mahasiswa_id',$mahasiswa->id)->first();
-                if($cekHariPertama == null){
-                    Pulang::create([
-                        "mahasiswa_id" => $mahasiswa->id,
-                        'hari_pertama' => true,
-                        'tanggal' => $today,
-                        'gambar' => $profileImage
-                    ]);
-                }else{
-                    Pulang::create([
-                        "mahasiswa_id" => $mahasiswa->id,
-                        'hari_pertama' => false,
-                        'tanggal' => $today,
-                        'gambar' => $profileImage
-                    ]);
-                }
+                // Simpan ke database
+                $pulang = Pulang::create([
+                    'mahasiswa_id' => $mahasiswa->id,
+                    'gambar' => $profileImage,
+                    'tanggal' => $tanggalHariIni,
+                ]);
+
+                return response()->json([
+                    "message" => "Kamu berhasil menambahkan gambar pulang",
+                    "data" => $pulang
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "File gambar tidak ditemukan."
+                ]);
             }
-
-            $tanggalHariIni = Carbon::now()->toDateString();
-            return response()->json([
-                "messagge" => "kamu berhasil tambah gambar pulang",
-                "data" => [
-                    Pulang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->latest()->first()
-                ]
-            ]);
         }
+
         return response()->json([
-            "message" => "kamu gagal mengirim data"
+            "message" => "Kamu gagal mengirim data."
         ]);
     }
 
@@ -330,7 +355,7 @@ class MahasiswaController extends Controller
         if ($user->roles == 'mahasiswa') {
             $today = Carbon::now()->format('Y-m-d');
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->latest()->first();
+            $pulang = Pulang::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $today)->latest()->first();
 
             return response()->json([
                 "message" => "kamu berhasil mengambil data pulang hari ini",
@@ -347,27 +372,32 @@ class MahasiswaController extends Controller
     // kegiatan
     public function kegiatan(Request $request)
     {
+
         $user = Auth::user();
+
         if ($user->roles == 'mahasiswa') {
-            $today = Carbon::now()->format('Y-m-d');
+
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            Kegiatan::create([
-                'deskripsi' => $request->deskripsi,
-                'jam_mulai' => $request->jam_mulai,
-                'jam_selesai' => $request->jam_selesai,
-                'tanggal' => $today,
-                'mahasiswa_id' => $mahasiswa->id
-            ]);
+            $today = Carbon::now()->format('Y-m-d');
+
+            $kegiatan = new Kegiatan;
+            $kegiatan->deskripsi = $request->deskripsi;
+            $kegiatan->jam_mulai = $request->jam_mulai;
+            $kegiatan->jam_selesai = $request->jam_selesai;
+            $kegiatan->tanggal = $today;
+            $kegiatan->mahasiswa_id = $mahasiswa->id;
+            $kegiatan->save();
 
             $tanggalHariIni = Carbon::now()->toDateString();
+
             return response()->json([
-                "message" => "kamu menambahkan kegiatan",
-                "data" => Kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$tanggalHariIni)->get()
+                "message" => "Kamu menambahkan kegiatan",
+                "data" => Kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $tanggalHariIni)->get()
             ]);
         }
 
         return response()->json([
-            "message" => "kamu gagal mengirim data"
+            "message" => "Kamu gagal mengirim data"
         ]);
     }
 
@@ -377,7 +407,7 @@ class MahasiswaController extends Controller
         if ($user->roles == 'mahasiswa') {
             $today = Carbon::now()->format('Y-m-d');
             $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-            $kegiatan = kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal',$today)->get();
+            $kegiatan = kegiatan::where('mahasiswa_id', $mahasiswa->id)->where('tanggal', $today)->get();
 
             return response()->json([
                 "message" => "kamu berhasil mengambil data kegiatan hari ini",
@@ -391,55 +421,12 @@ class MahasiswaController extends Controller
         ]);
     }
 
-    public function check_hari_ke_45()
+    public function updateStatus(Request $request)
     {
-        $user = Auth::user();
-        if ($user->roles == 'mahasiswa') {
-            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
-                $query->where('hari_pertama', true);
-            }])->where('user_id',$user->id)->first();
-
-            $mahasiswa->makeHidden([
-                'user_id',
-                'lokasi_id',
-                'gambar',
-                'pembimbing_lapangan_id',
-                'dosen_pembimbing_id',
-                'created_at',
-                'updated_at',
-            ]);
-
-            foreach ($mahasiswa->pulang as $pulang) {
-                $tanggalHariPertama = Carbon::parse($pulang->tanggal);
-                $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
-                $pulang->tanggal_hari_pertama = $pulang->tanggal;
-                $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
-                $pulang->makeHidden([
-                    'id',
-                    'mahasiswa_id',
-                    'gambar',
-                    'keterangan',
-                    'tanggal',
-                    'hari_pertama',
-                    'created_at',
-                    'updated_at',
-                ]);
-
-                $today = Carbon::now()->format('Y-m-d');
-                $pulang->check45Hari = false;
-                $checkHadirPadaHariKe45 = $pulang->where('tanggal', $tanggal45HariKedepan)->where('keterangan', 'hadir')->first();
-                if ($checkHadirPadaHariKe45) {
-                    $pulang->check45Hari = true;
-                } else
-                if ($today > $pulang->tanggal_45_hari_kedepan) {
-                    $pulang->check45Hari = true;
-                }
-            }
-
-            return response()->json([
-                "message" => "hari ini adalah hari ke 45",
-                "data" => $mahasiswa->pulang
-            ]);
-        }
+        $mahasiswa = Mahasiswa::find($request->mahasiswaId);
+        $isChecked = $request->input('isChecked');
+        $mahasiswa->keterangan = $isChecked;
+        $mahasiswa->save();
+        return response()->json(['success' => 'Status change successfully.']);
     }
 }

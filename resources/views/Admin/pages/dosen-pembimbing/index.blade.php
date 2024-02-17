@@ -31,7 +31,6 @@
                         <tbody>
                             @foreach ($data as $item)
                             <tr>
-                                {{-- @dd($item); --}}
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->dosen_pembimbing->nama }}</td>
                                 <td>{{ $item->username }}</td>
@@ -66,9 +65,9 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#mahasiswa').DataTable({
+            $('#dosen-pembimbing').DataTable({
                 // Scroll options
-                scrollY: '300px',
+                "pageLength": 5,
                 scrollX: true,
             });
         });

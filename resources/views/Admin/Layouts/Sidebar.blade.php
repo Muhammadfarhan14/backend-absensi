@@ -43,6 +43,13 @@
                  <div data-i18n="Analytics">Dosen Pembimbing</div>
              </a>
          </li>
+
+         <li class="menu-item {{ $title == 'Authentication' ? 'active' : '' }}">
+             <a href="{{ route('authentication.index') }}" class="menu-link">
+                <i class='menu-icon bx bx-log-in'></i>
+                 <div data-i18n="Analytics">authentication</div>
+             </a>
+         </li>
          <li class="menu-header small text-uppercase">
              <span class="menu-header-text">Lokasi PPL</span>
          </li>

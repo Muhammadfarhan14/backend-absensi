@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DosenPembimbingController;
+use App\Http\Controllers\KomenController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PembimbingLapanganController;
 use App\Http\Controllers\TabelController;
@@ -41,6 +42,7 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
     // datang
     Route::prefix('datang')->group(function () {
         Route::post('create', [MahasiswaController::class, 'datang_action']);
+        Route::post('update_gambar', [MahasiswaController::class, 'update_gambar']);
         Route::get('detail_datang_by_tanggal', [MahasiswaController::class, 'detail_datang_by_tanggal']);
     });
 
@@ -61,6 +63,13 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
         Route::post('create', [MahasiswaController::class, 'pulang_action']);
         Route::get('detail_pulang_by_tanggal', [MahasiswaController::class, 'detail_pulang_by_tanggal']);
     });
+
+    // komen
+    Route::prefix('komen')->group(function () {
+        Route::get('komen_by_tanggal',[KomenController::class,'getByTanggal']);
+        Route::post('store', [KomenController::class, 'store']);
+    });
+
 });
 #end mahasiswa
 
@@ -95,8 +104,14 @@ Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function(){
     Route::get('detail_lokasi_ppl',[DosenPembimbingController::class,'detail_lokasi_ppl']);
     Route::put('update_kendala/{id}',[DosenPembimbingController::class,'update_kendala']);
 
+    Route::prefix('komen')->group(function(){
+        Route::post('store', [KomenController::class, 'store']);
+    });
+
+    Route::get('home_komen',[DosenPembimbingController::class,'home_komen']);
+    Route::get('home_kendala_true',[DosenPembimbingController::class,'home_kendala_true']);
     // check hari ke 45
-    Route::get('check_hari_ke_45',[DosenPembimbingController::class,'check_hari_ke_45']);
+    // Route::get('check_hari_ke_45',[DosenPembimbingController::class,'check_hari_ke_45']);
     // generate PDF
     Route::get('semuaKegianPDF',[TabelController::class,'semuaKegianPDF']);
 });

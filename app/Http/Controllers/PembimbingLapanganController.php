@@ -139,42 +139,17 @@ class PembimbingLapanganController extends Controller
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
             $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $tanggalHariIni = Carbon::now()->toDateString();
             $mahasiswa = Mahasiswa::with('datang')->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first();
-
-            $datang = Datang::get();
             $today = Carbon::now()->format('Y-m-d');
-            foreach ($datang as $item) {
-                if ($item->tanggal == $today && $item->mahasiswa_id == $mahasiswa->id) {
-                    return response()->json([
-                        "message" => "data datang hari ini sudah ada",
-                        "data" => null
-                    ]);
-                }
-            }
-
-            $checkDataPertama = Datang::where('mahasiswa_id', $mahasiswa->id)->first();
-            if ($checkDataPertama == null) {
-                Datang::create([
-                    'mahasiswa_id' => $mahasiswa->id,
-                    'hari_pertama' => true,
-                    'tanggal' => $today
-                ]);
-            } else {
-                Datang::create([
-                    'mahasiswa_id' => $mahasiswa->id,
-                    'hari_pertama' => false,
-                    'tanggal' => $today
-                ]);
-            }
+            $data = Datang::create([
+                'mahasiswa_id' => $mahasiswa->id,
+                'keterangan' => 'hadir',
+                'tanggal' => $today,
+            ]);
 
             return response()->json([
                 "message" => "kamu berhasil membuat data datang",
-                "data" => [
-                    Mahasiswa::with(['datang' => function ($query) use ($tanggalHariIni) {
-                        $query->whereDate('tanggal', $tanggalHariIni);
-                    }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('id_PPL', $request->id_PPL)->first()
-                ],
+                "data" => $data,
             ]);
         }
         return response()->json([
@@ -247,72 +222,23 @@ class PembimbingLapanganController extends Controller
         ]);
     }
 
-    public function check_hari_ke_45()
+    public function updateStatus(Request $request)
     {
-        $user = Auth::user();
-        if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
-            $mahasiswa = Mahasiswa::with(['pulang' => function ($query) {
-                $query->where('hari_pertama', true);
-            }])->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
-
-            $mahasiswa->makeHidden([
-                'user_id',
-                'lokasi_id',
-                'gambar',
-                'pembimbing_lapangan_id',
-                'dosen_pembimbing_id',
-                'created_at',
-                'updated_at',
-            ]);
-
-            foreach ($mahasiswa as $mhs) {
-                $jumlahMahasiswa = $mhs->count();
-                foreach ($mhs->pulang as $pulang) {
-                    $tanggalHariPertama = Carbon::parse($pulang->tanggal);
-                    $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->format('Y-m-d');
-                    $pulang->tanggal_hari_pertama = $pulang->tanggal;
-                    $pulang->tanggal_45_hari_kedepan = $tanggal45HariKedepan;
-
-                    $pulang->makeHidden([
-                        'id',
-                        'mahasiswa_id',
-                        'gambar',
-                        'keterangan',
-                        'tanggal',
-                        'hari_pertama',
-                        'created_at',
-                        'updated_at',
-                    ]);
-
-                    $today = Carbon::now()->format('Y-m-d');
-                    $pulang->check45Hari = false;
-                    $checkHadirPadaHariKe45 = $pulang->where('tanggal', 'LIKE', '%' . $tanggal45HariKedepan . '%')->where('keterangan', 'hadir')->count();
-                    if ($checkHadirPadaHariKe45 == $jumlahMahasiswa && $today == $pulang->tanggal_45_hari_kedepan) {
-                        $pulang->check45Hari = true;
-                    } else
-                    if ($today > $pulang->tanggal_45_hari_kedepan) {
-                        $pulang->check45Hari = true;
-                    }
-                }
-            }
-            return response()->json([
-                "message" => "hari ini adalah hari ke 45",
-                "data" => $pulang
-            ]);
-        }
-        return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
+        $pembimbing_lapangan = PembimbingLapangan::find($request->pembimbingLapanganId);
+        $isChecked = $request->input('isChecked');
+        $pembimbing_lapangan->keterangan = $isChecked;
+        $pembimbing_lapangan->save();
+        return response()->json(['success' => 'Status change successfully.']);
     }
 
     public function select_mahasiswa_kriteria_penilaian()
     {
         $user = Auth::user();
         if ($user->roles == 'pembimbing_lapangan') {
-            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+            $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->where('keterangan', true)->first();
             $mahasiswa = Mahasiswa::with('kriteria_penilaian')
                 ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
+                ->where('keterangan',true)
                 ->select('id', 'nama', 'nim', 'gambar', 'lokasi_id')
                 ->get();
 

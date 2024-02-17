@@ -103,7 +103,7 @@
             <table style="margin: 0 auto; width:100%;text-align: center;">
                 <tr>
                     <td width="20%"> <img
-                            src="{{ url('https://rekreartive.com/wp-content/uploads/2019/03/Logo-UIN-Alauddin-Makassar-Warna.jpg') }}"
+                            src="{{ url('https://i0.wp.com/ypmic.or.id/wp-content/uploads/2020/09/logo-uin-png.png?ssl=1') }}"
                             width="70%" alt="">
                     </td>
                     <td>
@@ -283,17 +283,14 @@
                 </h3>
             </div>
             @php
-                $hariPertama = $item->pulang->where('hari_pertama', true)->first();
-                if ($hariPertama) {
-                    $tanggalHariPertama = Carbon::parse($hariPertama->tanggal);
-                    $formatHariPertama = Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM');
-                    $tanggal45HariKedepan = $tanggalHariPertama->addDays(45)->isoFormat('D MMMM YYYY');
-                }
+                $hariPertama = $item->pulang->first();
+                $hariTerakhir =  $item->pulang->last();
             @endphp
             <div class="text-center" style="margin: 10px 0;text-transform:uppercase;">
                 <h3 style="margin: 0 0;">Laporan kegiatan</h3>
-                <h4 style="margin: 10px 0 5px;">Periode Tanggal {{ $formatHariPertama }} - s.d
-                    {{ $tanggal45HariKedepan }}</h4>
+                <h4 style="margin: 10px 0 5px;">Periode Tanggal
+                    {{ Carbon::parse($hariPertama->tanggal)->isoFormat('D MMMM') }} - s.d
+                    {{ Carbon::parse($hariTerakhir->tanggal)->isoFormat('D MMMM YYYY') }}</h4>
                 <table style="margin: 0 0;">
                     <tr>
                         <td style="height: 25px;">Jurusan/Prodi</td>

@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Log;
 
 class AuthController extends Controller
 {
@@ -99,6 +100,7 @@ class AuthController extends Controller
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
         $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+        
         if ($user->roles == 'mahasiswa') {
             return response()->json([
                 "message" => "data user yang login",
@@ -118,6 +120,7 @@ class AuthController extends Controller
 
         if ($user->roles == 'pembimbing_lapangan') {
             $mhs = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->get();
+            Log::debug($mhs);
             foreach ($mhs as $item) {
                 $item->lokasi;
 

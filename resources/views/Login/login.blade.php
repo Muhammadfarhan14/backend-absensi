@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-md-6 mx-auto mt-2">
                     <div class="card px-5 py-4">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="" class="d-block mx-auto" width="80%">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="" class="d-block mx-auto" width="50%">
                         <p class="text-center fs-3 fw-semibold mb-4 mt-2 title">Halaman Login</p>
                         @if (session('success'))
                             <p class="alert alert-success">{{ session('success') }}</p>

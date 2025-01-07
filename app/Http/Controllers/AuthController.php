@@ -13,7 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -21,8 +21,8 @@ class AuthController extends Controller
     public function index()
     {
         $today = Carbon::now()->format('Y-m-d');
-        $token = AuthToken::where('tanggal',$today)->where('name','!=','admin')->get();
-        return view('Admin.pages.authentication.index',compact('token'));
+        $token = AuthToken::where('tanggal', $today)->where('name', '!=', 'admin')->get();
+        return view('Admin.pages.authentication.index', compact('token'));
     }
 
     public function destroy($id)
@@ -46,7 +46,7 @@ class AuthController extends Controller
     public function logout_web()
     {
         $user = Auth::user();
-        $token = AuthToken::where('name',$user->username)->get();
+        $token = AuthToken::where('name', $user->username)->get();
         foreach ($token as $item) {
             $item->delete();
         }
@@ -100,7 +100,7 @@ class AuthController extends Controller
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
         $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-        
+
         if ($user->roles == 'mahasiswa') {
             return response()->json([
                 "message" => "data user yang login",
@@ -119,7 +119,7 @@ class AuthController extends Controller
         }
 
         if ($user->roles == 'pembimbing_lapangan') {
-            $mhs = Mahasiswa::where('pembimbing_lapangan_id',$pembimbing_lapangan->id)->get();
+            $mhs = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
             Log::debug($mhs);
             foreach ($mhs as $item) {
                 $item->lokasi;
@@ -129,7 +129,7 @@ class AuthController extends Controller
                     "data" => [
                         "nama_pembimbing_lapangan" => $pembimbing_lapangan->nama,
                         "keterangan_pembimbing_lapangan" => $pembimbing_lapangan->keterangan,
-                        "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama ,
+                        "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama,
                         "roles" => $user->roles,
                         "lokasi" => $item->lokasi
                     ],
@@ -142,11 +142,10 @@ class AuthController extends Controller
                 "message" => "data user yang login",
                 "data" => [
                     "nama" => $dosen_pembimbing->nama,
-                    "gambar" =>$dosen_pembimbing->gambar,
+                    "gambar" => $dosen_pembimbing->gambar,
                     "roles" => $user->roles,
                 ],
             ]);
         }
-
     }
 }

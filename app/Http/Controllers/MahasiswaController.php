@@ -19,7 +19,7 @@ use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+
 
 
 
@@ -211,7 +211,7 @@ class MahasiswaController extends Controller
 
             // Iterasi melalui rentang waktu dan cek absensi
             foreach ($allowedTimes as $timeRange) {
-                $absensi = Datang::where('mahasiswa_id', $mahasiswa->id)
+                $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
                     ->where('created_at', $today)
                     ->whereBetween('created_at', [$timeRange['start'], $timeRange['end']])
                     ->first();

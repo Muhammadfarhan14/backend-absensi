@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\DosenPembimbingRequest;
 use App\Http\Requests\UpdateDosenPembimbingRequest;
+use App\Models\Absen;
+use Illuminate\Support\Facades\Log;
 
 class DosenPembimbingController extends Controller
 {
@@ -110,51 +112,67 @@ class DosenPembimbingController extends Controller
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
             $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->get();
 
-            $lokasi_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
-            $pembimbing_lapangan_tampil = array(); // Array untuk menyimpan lokasi yang telah ditampilkan
+            $lokasi_ppl = []; // Inisialisasi array untuk menampung data lokasi PPL
+            $lokasi_tampil = []; // Array untuk menyimpan lokasi yang telah ditampilkan
+            $pembimbing_lapangan_tampil = []; // Array untuk menyimpan lokasi yang telah ditampilkan
 
             foreach ($mahasiswa as $key => $value) {
                 $lokasi = Lokasi::where('id', $value->lokasi_id)->first();
                 $pembimbing_lapangan = PembimbingLapangan::where('id', $value->pembimbing_lapangan_id)->first();
 
-                // persentasi kehadiran
-                $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('lokasi_id', $lokasi->id)->get();
-                $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->where('lokasi_id', $lokasi->id)
+                // Persentasi kehadiran
+                $jumlahMahasiswaPadaLokasiPPL = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)
+                    ->where('lokasi_id', $lokasi->id)
+                    ->get();
+                $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)
+                    ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
+                    ->where('lokasi_id', $lokasi->id)
                     ->whereHas('datang', function ($query) {
                         $today = Carbon::now()->format('Y-m-d');
                         $query->where('keterangan', 'hadir')->where('tanggal', $today);
                     })->get();
-                if ($mahasiswaDatang != null) {
-                    $persentasiKehadiran = ($mahasiswaDatang->count() / $jumlahMahasiswaPadaLokasiPPL->count()) * 100;
-                } else {
-                    $persentasiKehadiran = 0;
-                }
+
+                $persentasiKehadiran = $mahasiswaDatang->count() > 0
+                    ? ($mahasiswaDatang->count() / $jumlahMahasiswaPadaLokasiPPL->count()) * 100
+                    : 0;
 
                 // Periksa apakah lokasi sudah ditampilkan sebelumnya
                 if (!in_array($lokasi->nama, $lokasi_tampil) || !in_array($pembimbing_lapangan->nama, $pembimbing_lapangan_tampil)) {
                     $lokasi_ppl[] = [
                         'id' => $lokasi->id,
                         'nama' => $lokasi->nama,
-                        'gambar' => $lokasi->gambar,
+                        'gambar' => basename($lokasi->gambar), // Ambil hanya nama file atau path gambar
                         'alamat' => $lokasi->alamat,
                         'pembimbing_lapangan' => $pembimbing_lapangan->nama,
                         'dosen_pembimbing' => $dosen_pembimbing->nama,
                         "pesentasi_kehadiran" => $persentasiKehadiran
                     ];
                     $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil
-                    $pembimbing_lapangan_tampil[] = $pembimbing_lapangan->nama; // Tambahkan lokasi ke array lokasi_tampil
+                    $pembimbing_lapangan_tampil[] = $pembimbing_lapangan->nama; // Tambahkan lokasi ke array pembimbing_lapangan_tampil
                 }
             }
 
+            // Cek apakah data lokasi PPL ditemukan
+            if (empty($lokasi_ppl)) {
+                return response()->json([
+                    "message" => "Data lokasi PPL tidak ditemukan",
+                    "data" => []
+                ], 404);
+            }
+
             return response()->json([
-                "message" => "kamu berhasil mengirim data lokasi PPL",
+                "message" => "Kamu berhasil mengirim data lokasi PPL",
                 "data" => $lokasi_ppl,
             ]);
         }
+
         return response()->json([
-            "message" => "kamu gagal mengirim data"
-        ]);
+            "message" => "Bukan dosen pembimbing"
+        ], 403);
     }
+
+
+
 
     public function home_kendala()
     {
@@ -199,12 +217,12 @@ class DosenPembimbingController extends Controller
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
 
             if ($dosen_pembimbing) {
-                $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->select('id','lokasi_id','nama','nim')->get();
+                $mahasiswa = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)->select('id', 'lokasi_id', 'nama', 'nim')->get();
                 $today = Carbon::now()->format('Y-m-d');
                 $komentarData = [];
 
                 foreach ($mahasiswa as $key => $item) {
-                    $lokasi = Lokasi::where('id', $item->lokasi_id)->select('id','nama')->first();
+                    $lokasi = Lokasi::where('id', $item->lokasi_id)->select('id', 'nama')->first();
 
                     if ($lokasi) {
                         $kendala = Kendala::where('mahasiswa_id', $item->id)
@@ -220,11 +238,11 @@ class DosenPembimbingController extends Controller
                             ]);
 
                             $komentarData[] =
-                            [
-                                'mahasiswa' => $item->toArray(),
-                                'lokasi' => $lokasi->toArray(),
-                                'komen' => $komen ? $komen->toArray() : ""
-                            ];
+                                [
+                                    'mahasiswa' => $item->toArray(),
+                                    'lokasi' => $lokasi->toArray(),
+                                    'komen' => $komen ? $komen->toArray() : ""
+                                ];
                         }
                     }
                 }
@@ -283,89 +301,181 @@ class DosenPembimbingController extends Controller
         ], 403);
     }
 
+    // public function detail_lokasi_ppl(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     if ($user->roles == 'dosen_pembimbing') {
+    //         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+    //         $today = $request->tanggal;
+    //         $lokasi_id = $request->lokasi_id;
+    //         $mahasiswa = Mahasiswa::with(['kegiatan' => function ($query) use ($today) {
+    //             $query->whereDate('tanggal', $today);
+    //         }, 'datang' => function ($query) use ($today) {
+    //             $query->whereDate('tanggal', $today);
+    //         }, 'pulang' => function ($query) use ($today) {
+    //             $query->whereDate('tanggal', $today);
+    //         }])
+    //             ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
+    //             ->where('lokasi_id', $lokasi_id)->get();
+
+    //         foreach ($mahasiswa as $mhs) {
+    //             $lokasi = Lokasi::where('id', $mhs->lokasi_id)->first();
+    //         }
+
+    //         $mahasiswa->makeHidden([
+    //             'user_id',
+    //             'lokasi_id',
+    //             'pembimbing_lapangan_id',
+    //             'dosen_pembimbing_id',
+    //             'created_at',
+    //             'updated_at',
+    //         ]);
+
+    //         $mahasiswa->each(function ($mahasiswa) {
+
+    //             $mahasiswa->gambar = $mahasiswa->gambar ?? "";
+    //             $mahasiswa->pdf = $mahasiswa->pdf ?? "";
+    //             $mahasiswa->kegiatan->makeHidden([
+    //                 'tanggal',
+    //                 'hari_pertama',
+    //                 'jam_selesai',
+    //                 'created_at',
+    //                 'updated_at',
+
+    //             ]);
+
+    //             $mahasiswa->datang->each(function ($datang) {
+    //                 $datang->tanggal = $datang->tanggal ?? "";
+    //                 $datang->hari_pertama = $datang->hari_pertama ?? "";
+    //                 $datang->keterangan = $datang->keterangan ?? "";
+    //                 $datang->gambar = $datang->gambar ?? "";
+    //                 $datang->jam_datang = $datang->created_at ? $datang->created_at->format('H:i') : "";
+    //                 $datang->updated_at = $datang->updated_at ?? "";
+    //             });
+    //             $mahasiswa->datang->makeHidden([
+    //                 'hari_pertama',
+    //                 'created_at',
+    //                 'updated_at',
+    //             ]);
+
+    //             $mahasiswa->pulang->each(function ($pulang) {
+    //                 $pulang->tanggal = $pulang->tanggal ?? "";
+    //                 $pulang->hari_pertama = $pulang->hari_pertama ?? "";
+    //                 $pulang->keterangan = $pulang->keterangan ?? "";
+    //                 $pulang->gambar = $pulang->gambar ?? "";
+    //                 $pulang->jam_pulang = $pulang->created_at ? $pulang->created_at->format('H:i') : "";
+    //                 $pulang->updated_at = $pulang->updated_at ?? "";
+    //             });
+    //             $mahasiswa->pulang->makeHidden([
+    //                 'tanggal',
+    //                 'hari_pertama',
+    //                 'created_at',
+    //                 'updated_at',
+    //             ]);
+    //         });
+
+    //         return response()->json([
+    //             "message" => "kamu berhasil mengirim data mahasiswa",
+    //             "data" => $mahasiswa
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         "message" => "kamu gagal mengirim data"
+    //     ]);
+    // }
+
     public function detail_lokasi_ppl(Request $request)
     {
         $user = Auth::user();
         if ($user->roles == 'dosen_pembimbing') {
             $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-            $today = $request->tanggal;
+            $tanggal = $request->tanggal;
             $lokasi_id = $request->lokasi_id;
-            $mahasiswa = Mahasiswa::with(['kegiatan' => function ($query) use ($today) {
-                $query->whereDate('tanggal', $today);
-            }, 'datang' => function ($query) use ($today) {
-                $query->whereDate('tanggal', $today);
-            }, 'pulang' => function ($query) use ($today) {
-                $query->whereDate('tanggal', $today);
-            }])
-                ->where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                ->where('lokasi_id', $lokasi_id)->get();
+            $dosen_pembimbing_id = $request->dosen_pembimbing_id;
 
-            foreach ($mahasiswa as $mhs) {
-                $lokasi = Lokasi::where('id', $mhs->lokasi_id)->first();
+            // Ambil tanggal hari ini
+            $today = now()->format('Y-m-d'); // Format tanggal: YYYY-MM-DD
+
+            $allowedTimes = [
+                ['start' => '00:00', 'end' => '01:00'],
+                ['start' => '02:00', 'end' => '02:30'],
+                ['start' => '03:00', 'end' => '03:30'],
+                ['start' => '04:00', 'end' => '04:30'],
+                ['start' => '05:00', 'end' => '05:30'],
+            ];
+
+            // Query mahasiswa dengan filter dosen_pembimbing_id dan lokasi_id
+            $mahasiswaList = Mahasiswa::where('lokasi_id', $lokasi_id)
+                ->where('dosen_pembimbing_id', $dosen_pembimbing_id)
+                ->get();
+
+            if ($mahasiswaList->isEmpty()) {
+                return response()->json([
+                    "message" => "Tidak ada data mahasiswa di lokasi ini",
+                    "data" => []
+                ], 404);
             }
 
-            $mahasiswa->makeHidden([
-                'user_id',
-                'lokasi_id',
-                'pembimbing_lapangan_id',
-                'dosen_pembimbing_id',
-                'created_at',
-                'updated_at',
-            ]);
+            $result = [];
 
-            $mahasiswa->each(function ($mahasiswa) {
+            foreach ($mahasiswaList as $mahasiswa) {
+                $dataAbsen = [];
+                foreach ($allowedTimes as $timeRange) {
+                    // Cek absensi berdasarkan mahasiswa_id, tanggal, dan rentang waktu
+                    $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
+                        ->whereDate('created_at', $tanggal)
+                        ->whereTime('created_at', '>=', $timeRange['start'])
+                        ->whereTime('created_at', '<=', $timeRange['end'])
+                        ->first();
 
-                $mahasiswa->gambar = $mahasiswa->gambar ?? "";
-                $mahasiswa->pdf = $mahasiswa->pdf ?? "";
-                $mahasiswa->kegiatan->makeHidden([
-                    'tanggal',
-                    'hari_pertama',
-                    'jam_selesai',
-                    'created_at',
-                    'updated_at',
+                    // Periksa apakah tanggal yang dikirim belum melewati tanggal hari ini
+                    Log::debug("tanggal => $tanggal");
+                    Log::debug("today => $today");
+                    if ($tanggal > $today) {
+                        // Jika belum melewati tanggal hari ini, set status "belum absen"
+                        $status = "belum absen";
+                    } else {
+                        // Jika sudah melewati tanggal hari ini, periksa absensi
+                        if ($absensi) {
+                            if ($absensi->status) {
+                                $status = "tidak hadir";
+                            } else {
+                                $status = "absen";
+                            }
+                        } else {
+                            $status = "tidak hadir"; // Tidak ada absensi pada rentang waktu
+                        }
+                    }
 
-                ]);
+                    $dataAbsen[] = [
+                        "tanggal" => $tanggal,
+                        "start_time" => $timeRange['start'],
+                        "end_time" => $timeRange['end'],
+                        "status" => $status
+                    ];
+                }
 
-                $mahasiswa->datang->each(function ($datang) {
-                    $datang->tanggal = $datang->tanggal ?? "";
-                    $datang->hari_pertama = $datang->hari_pertama ?? "";
-                    $datang->keterangan = $datang->keterangan ?? "";
-                    $datang->gambar = $datang->gambar ?? "";
-                    $datang->jam_datang = $datang->created_at ? $datang->created_at->format('H:i') : "";
-                    $datang->updated_at = $datang->updated_at ?? "";
-                });
-                $mahasiswa->datang->makeHidden([
-                    'hari_pertama',
-                    'created_at',
-                    'updated_at',
-                ]);
-
-                $mahasiswa->pulang->each(function ($pulang) {
-                    $pulang->tanggal = $pulang->tanggal ?? "";
-                    $pulang->hari_pertama = $pulang->hari_pertama ?? "";
-                    $pulang->keterangan = $pulang->keterangan ?? "";
-                    $pulang->gambar = $pulang->gambar ?? "";
-                    $pulang->jam_pulang = $pulang->created_at ? $pulang->created_at->format('H:i') : "";
-                    $pulang->updated_at = $pulang->updated_at ?? "";
-                });
-                $mahasiswa->pulang->makeHidden([
-                    'tanggal',
-                    'hari_pertama',
-                    'created_at',
-                    'updated_at',
-                ]);
-            });
+                $result[] = [
+                    "nama" => $mahasiswa->nama,
+                    "nim" => $mahasiswa->nim,
+                    "status_absen" => $dataAbsen
+                ];
+            }
 
             return response()->json([
-                "message" => "kamu berhasil mengirim data mahasiswa",
-                "data" => $mahasiswa
+                "message" => "Kamu berhasil mengirim data mahasiswa",
+                "data" => $result
             ]);
         }
 
         return response()->json([
-            "message" => "kamu gagal mengirim data"
+            "message" => "Kamu gagal mengirim data"
         ]);
     }
+
+
+
 
     public function update_kendala($id)
     {

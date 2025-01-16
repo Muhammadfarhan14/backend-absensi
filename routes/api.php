@@ -110,7 +110,7 @@ Route::middleware('auth:sanctum')->prefix('pembimbing-lapangan')->group(function
 Route::middleware('auth:sanctum')->prefix('dosen-pembimbing')->group(function () {
     Route::get('home_lokasi_ppl', [DosenPembimbingController::class, 'home_lokasi_ppl']);
     Route::get('home_kendala', [DosenPembimbingController::class, 'home_kendala']);
-    Route::get('detail_lokasi_ppl', [DosenPembimbingController::class, 'detail_lokasi_ppl']);
+    Route::post('detail_lokasi_ppl', [DosenPembimbingController::class, 'detail_lokasi_ppl']);
     Route::put('update_kendala/{id}', [DosenPembimbingController::class, 'update_kendala']);
 
     Route::prefix('komen')->group(function () {

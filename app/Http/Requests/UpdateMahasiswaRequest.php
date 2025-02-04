@@ -28,15 +28,15 @@ class UpdateMahasiswaRequest extends FormRequest
             'nim' => 'required',
             'password' => 'required',
             'lokasi_id' => 'required',
-            'pembimbing_lapangan_id' => 'required',
+            // 'pembimbing_lapangan_id' => 'required',
             'dosen_pembimbing_id' => 'required',
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            // 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 
     public function messages()
     {
-        return[
+        return [
             'nama.required' => 'nama tidak boleh kosong',
             'nim.required' => 'nim tidak boleh kosong',
             'nim.unique' => 'nim sudah dipakai',

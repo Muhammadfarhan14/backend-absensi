@@ -37,16 +37,16 @@ class DosenPembimbingController extends Controller
         $user->roles = "dosen_pembimbing";
         $user->save();
 
-        $foto = $request->file('gambar');
-        $destinationPath = 'images/';
-        $baseURL = url('/');
-        $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
-        $foto->move($destinationPath, $profileImage);
+        // $foto = $request->file('gambar');
+        // $destinationPath = 'images/';
+        // $baseURL = url('/');
+        // $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis')  . "." . $foto->getClientOriginalExtension();
+        // $foto->move($destinationPath, $profileImage);
 
         $dosen_pembimbing = new DosenPembimbing();
         $dosen_pembimbing->nama = $user->nama;
         $dosen_pembimbing->user_id = $user->id;
-        $dosen_pembimbing->gambar = $profileImage;
+        // $dosen_pembimbing->gambar = $profileImage;
         $dosen_pembimbing->save();
 
         return redirect()->route('dosen-pembimbing.index');
@@ -58,14 +58,14 @@ class DosenPembimbingController extends Controller
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
 
         if ($request->gambar) {
-            $baseURL = url('/');
-            $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
-            unlink($file_path);
+            // $baseURL = url('/');
+            // $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
+            // unlink($file_path);
 
-            $foto = $request->file('gambar');
-            $destinationPath = 'images/';
-            $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
-            $foto->move($destinationPath, $profileImage);
+            // $foto = $request->file('gambar');
+            // $destinationPath = 'images/';
+            // $profileImage = $baseURL . '/images/' . Str::slug($request->nama) . "." . $foto->getClientOriginalExtension();
+            // $foto->move($destinationPath, $profileImage);
 
             $user->update([
                 'username' => $request->username,
@@ -75,7 +75,7 @@ class DosenPembimbingController extends Controller
 
             $dosen_pembimbing->update([
                 'nama' => $user->nama,
-                'gambar' => $profileImage
+                // 'gambar' => $profileImage
             ]);
         } else {
             $user->update([
@@ -94,9 +94,9 @@ class DosenPembimbingController extends Controller
     {
         $user = User::where('id', $id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
-        $baseURL = url('/');
-        $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
-        unlink($file_path);
+        // $baseURL = url('/');
+        // $file_path = Str::replace($ba    seURL . '/images/', '', public_path() . '/images/' . $dosen_pembimbing->gambar);
+        // unlink($file_path);
         $dosen_pembimbing->delete();
         $user->delete();
 
@@ -125,7 +125,7 @@ class DosenPembimbingController extends Controller
                     ->where('lokasi_id', $lokasi->id)
                     ->get();
                 $mahasiswaDatang = Mahasiswa::where('dosen_pembimbing_id', $dosen_pembimbing->id)
-                    ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
+                    // ->where('pembimbing_lapangan_id', $pembimbing_lapangan->id)
                     ->where('lokasi_id', $lokasi->id)
                     ->whereHas('datang', function ($query) {
                         $today = Carbon::now()->format('Y-m-d');
@@ -143,12 +143,12 @@ class DosenPembimbingController extends Controller
                         'nama' => $lokasi->nama,
                         'gambar' => basename($lokasi->gambar), // Ambil hanya nama file atau path gambar
                         'alamat' => $lokasi->alamat,
-                        'pembimbing_lapangan' => $pembimbing_lapangan->nama,
+                        // 'pembimbing_lapangan' => $pembimbing_lapangan->nama,
                         'dosen_pembimbing' => $dosen_pembimbing->nama,
                         "pesentasi_kehadiran" => $persentasiKehadiran
                     ];
                     $lokasi_tampil[] = $lokasi->nama; // Tambahkan lokasi ke array lokasi_tampil
-                    $pembimbing_lapangan_tampil[] = $pembimbing_lapangan->nama; // Tambahkan lokasi ke array pembimbing_lapangan_tampil
+                    // $pembimbing_lapangan_tampil[] = $pembimbing_lapangan->nama; // Tambahkan lokasi ke array pembimbing_lapangan_tampil
                 }
             }
 
@@ -170,9 +170,6 @@ class DosenPembimbingController extends Controller
             "message" => "Bukan dosen pembimbing"
         ], 403);
     }
-
-
-
 
     public function home_kendala()
     {

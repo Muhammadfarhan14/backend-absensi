@@ -26,7 +26,7 @@ class UpdateLokasiRequest extends FormRequest
         return [
             'nama' => 'required',
             'alamat' => 'required',
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            // 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 

@@ -28,26 +28,26 @@ class MahasiswaRequest extends FormRequest
             'nim' => 'required|unique:mahasiswas',
             'password' => 'required',
             'lokasi_id' => 'required',
-            'pembimbing_lapangan_id' => 'required',
+            // 'pembimbing_lapangan_id' => 'required',
             'dosen_pembimbing_id' => 'required',
-            'gambar' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            // 'gambar' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 
     public function messages()
     {
-        return[
+        return [
             'nama.required' => 'nama tidak boleh kosong',
             'nim.required' => 'nim tidak boleh kosong',
             'nim.unique' => 'nim sudah dipakai',
             'password.required' => 'password tidak boleh kosong',
             'lokasi_id.required' => 'lokasi tidak boleh kosong',
-            'pembimbing_lapangan_id.required' => 'pembimbing lapangan tidak boleh kosong',
+            // 'pembimbing_lapangan_id.required' => 'pembimbing lapangan tidak boleh kosong',
             'dosen_pembimbing_id.required' => 'dosen pembimbing tidak boleh kosong',
-            'gambar.required' => 'gambar tidak boleh kosong',
-            'gambar.image' => 'file yang dikirim harus gambar',
-            'gambar.mimes' => 'file gambar harus menggunkan jpg,png,jpeg,gif atau svg',
-            'gambar.max' => 'gambar maksimal 2 mb'
+            // 'gambar.required' => 'gambar tidak boleh kosong',
+            // 'gambar.image' => 'file yang dikirim harus gambar',
+            // 'gambar.mimes' => 'file gambar harus menggunkan jpg,png,jpeg,gif atau svg',
+            // 'gambar.max' => 'gambar maksimal 2 mb'
         ];
     }
 }

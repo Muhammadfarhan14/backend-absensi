@@ -19,6 +19,7 @@ use App\Models\PembimbingLapangan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -35,8 +36,8 @@ class MahasiswaController extends Controller
         $mhs = Mahasiswa::get();
         $lokasi = Lokasi::get();
         $dosen_pembimbing = DosenPembimbing::get();
-        $pembimbing_lapangan = PembimbingLapangan::get();
-        return view('Admin.pages.mahasiswa.index', ['mhs' => $mhs, 'lokasi' => $lokasi, 'dosen_pembimbing' => $dosen_pembimbing, 'pembimbing_lapangan' => $pembimbing_lapangan]);
+        // $pembimbing_lapangan = PembimbingLapangan::get();
+        return view('Admin.pages.mahasiswa.index', ['mhs' => $mhs, 'lokasi' => $lokasi, 'dosen_pembimbing' => $dosen_pembimbing]);
     }
 
 
@@ -49,6 +50,7 @@ class MahasiswaController extends Controller
     public function store(MahasiswaRequest $request)
     {
 
+
         $mhs = new Mahasiswa();
         $mhs->nama = $request->nama;
         $mhs->nim = $request->nim;
@@ -57,13 +59,13 @@ class MahasiswaController extends Controller
         $mhs->dosen_pembimbing_id = $request->dosen_pembimbing_id;
         $mhs->pembimbing_lapangan_id = $request->pembimbing_lapangan_id;
 
-        $foto = $request->file('gambar');
-        $destinationPath = 'images/';
-        $baseURL = url('/');
-        $profileImage = $baseURL . "/images/" . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
-        $foto->move($destinationPath, $profileImage);
-        $mhs->gambar = $profileImage;
-        $mhs->save();
+        // $foto = $request->file('gambar');
+        // $destinationPath = 'images/';
+        // $baseURL = url('/');
+        // $profileImage = $baseURL . "/images/" . Str::slug($request->nama) . '-' . Carbon::now()->format('YmdHis') . "." . $foto->getClientOriginalExtension();
+        // $foto->move($destinationPath, $profileImage);
+        // $mhs->gambar = $profileImage;
+        // $mhs->save();
 
         $user = new User();
         $user->username = $mhs->nim;
@@ -87,6 +89,7 @@ class MahasiswaController extends Controller
      */
     public function update(UpdateMahasiswaRequest $request, $id)
     {
+
         $mhs = Mahasiswa::where('id', $id)->first();
         $user = User::where('id', $mhs->user_id)->where('roles', 'mahasiswa')->first();
 
@@ -105,8 +108,8 @@ class MahasiswaController extends Controller
                 'nim' => $request->nim,
                 'lokasi_id' => $request->lokasi_id,
                 'dosen_pembimbing_id' => $request->dosen_pembimbing_id,
-                'pembimbing_lapangan_id' => $request->pembimbing_lapangan_id,
-                'gambar' => $profileImage,
+                // 'pembimbing_lapangan_id' => $request->pembimbing_lapangan_id,
+                // 'gambar' => $profileImage,
             ]);
             $user->update([
                 'nama' => $mhs->nama,
@@ -119,7 +122,7 @@ class MahasiswaController extends Controller
                 'nim' => $request->nim,
                 'lokasi_id' => $request->lokasi_id,
                 'dosen_pembimbing_id' => $request->dosen_pembimbing_id,
-                'pembimbing_lapangan_id' => $request->pembimbing_lapangan_id,
+                // 'pembimbing_lapangan_id' => $request->pembimbing_lapangan_id,
             ]);
             $user->update([
                 'nama' => $mhs->nama,
@@ -141,9 +144,9 @@ class MahasiswaController extends Controller
     {
         $mhs = Mahasiswa::where('id', $id)->first();
         $user = User::where('id', $mhs->user_id)->first();
-        $baseURL = url('/');
-        $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $mhs->gambar);
-        unlink($file_path);
+        // $baseURL = url('/');
+        // $file_path = Str::replace($baseURL . '/images/', '', public_path() . '/images/' . $mhs->gambar);
+        // unlink($file_path);
         $mhs->delete();
         $user->delete();
         return redirect()->route('mahasiswa.index');
@@ -200,21 +203,34 @@ class MahasiswaController extends Controller
 
             // Rentang waktu absensi yang diizinkan
             $allowedTimes = [
-                ['start' => '01:00', 'end' => '01:30'],
-                ['start' => '02:00', 'end' => '02:30'],
-                ['start' => '03:00', 'end' => '03:30'],
-                ['start' => '04:00', 'end' => '04:30'],
-                ['start' => '05:00', 'end' => '05:30'],
+                ['start' => '08:00', 'end' => '08:30'],
+                ['start' => '09:00', 'end' => '09:30'],
+                ['start' => '13:00', 'end' => '13:30'],
+                ['start' => '15:00', 'end' => '15:30'],
+                ['start' => '17:00', 'end' => '17:30'],
             ];
 
+            // $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
+            //     ->where('created_at', $today)
+            //     ->first();
+
+            // Log::debug($absensi);
+
+
             $dataAbsen = [];
+
+            Log::debug($mahasiswa->id);
+
 
             // Iterasi melalui rentang waktu dan cek absensi
             foreach ($allowedTimes as $timeRange) {
                 $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
-                    ->where('created_at', $today)
-                    ->whereBetween('created_at', [$timeRange['start'], $timeRange['end']])
+                    ->whereDate('created_at', $today) // Filter tanggal saja
+                    ->whereTime('created_at', '>=', $timeRange['start']) // Awal waktu
+                    ->whereTime('created_at', '<=', $timeRange['end']) // Akhir waktu
                     ->first();
+
+                Log::debug($absensi);
 
                 if ($absensi) {
                     $status = "absen"; // Sudah absen
@@ -244,6 +260,94 @@ class MahasiswaController extends Controller
             "message" => "Gagal ambil data",
         ]);
     }
+
+    public function get_absen_bulan()
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+            $currentMonth = Carbon::now()->month; // Mendapatkan bulan saat ini
+            $currentYear = Carbon::now()->year; // Mendapatkan tahun saat ini
+
+            // Log untuk debugging
+            Log::debug('Mahasiswa ID: ' . $mahasiswa->id);
+            Log::debug('Bulan: ' . $currentMonth);
+            Log::debug('Tahun: ' . $currentYear);
+
+            // Query untuk menghitung jumlah berdasarkan status
+            $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
+                ->whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
+                ->selectRaw('status, COUNT(*) as jumlah')
+                ->groupBy('status')
+                ->get();
+
+            return response()->json([
+                "message" => "Berhasil",
+                "data" => $absensi
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Gagal ambil data",
+        ]);
+    }
+
+    public function get_absen_tanggal($month, $year)
+    {
+        $user = Auth::user();
+        if ($user->roles == 'mahasiswa') {
+            $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+
+            // Tentukan rentang waktu absensi yang diizinkan
+            $allowedTimes = [
+                ['start' => '08:00', 'end' => '08:30'],
+                ['start' => '09:00', 'end' => '09:30'],
+                ['start' => '13:00', 'end' => '13:30'],
+                ['start' => '15:00', 'end' => '15:30'],
+                ['start' => '17:00', 'end' => '17:30'],
+            ];
+
+            $dataAbsen = [];
+
+            // Dapatkan jumlah hari dalam bulan tertentu
+            $daysInMonth = Carbon::create($year, $month)->daysInMonth;
+
+            // Iterasi melalui setiap tanggal dalam bulan
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $currentDate = Carbon::create($year, $month, $day)->format('Y-m-d');
+                $absenStatuses = [];
+
+                // Iterasi melalui rentang waktu absensi
+                foreach ($allowedTimes as $timeRange) {
+                    $absensi = Absen::where('mahasiswa_id', $mahasiswa->id)
+                        ->whereDate('created_at', $currentDate)
+                        ->whereTime('created_at', '>=', $timeRange['start'])
+                        ->whereTime('created_at', '<=', $timeRange['end'])
+                        ->exists();
+
+                    // Tambahkan status hadir atau tidak hadir
+                    $absenStatuses[] = $absensi ? 'hadir' : 'tidak hadir';
+                }
+
+                // Tambahkan data absen untuk tanggal tertentu
+                $dataAbsen[] = [
+                    "tanggal" => $currentDate,
+                    "absen" => $absenStatuses,
+                ];
+            }
+
+            return response()->json([
+                "message" => "Berhasil",
+                "data" => $dataAbsen,
+            ]);
+        }
+
+        return response()->json([
+            "message" => "Gagal ambil data",
+        ]);
+    }
+
 
 
     // public function check_absen()
@@ -292,11 +396,11 @@ class MahasiswaController extends Controller
 
             // Rentang waktu absensi yang diizinkan
             $allowedTimes = [
-                ['start' => '01:00', 'end' => '01:30'],
-                ['start' => '02:00', 'end' => '02:30'],
-                ['start' => '03:00', 'end' => '03:30'],
-                ['start' => '04:00', 'end' => '04:30'],
-                ['start' => '05:00', 'end' => '05:30'],
+                ['start' => '08:00', 'end' => '08:30'],
+                ['start' => '09:00', 'end' => '09:30'],
+                ['start' => '13:00', 'end' => '13:30'],
+                ['start' => '15:00', 'end' => '15:30'],
+                ['start' => '17:00', 'end' => '17:30'],
             ];
 
 
@@ -352,9 +456,18 @@ class MahasiswaController extends Controller
             $dokumenUrl = null;
 
             if ($status == "izin") {
+                if (!$dokumen) {
+                    return response()->json([
+                        "message" => "Dokumen harus diunggah jika status adalah izin"
+                    ], 400);
+                }
+
+                // Proses dokumen jika status adalah "izin"
                 $destinationPath = 'pdf/';
                 $baseURL = url('/');
                 $dokumenUrl = $baseURL . '/pdf/' . Str::slug($mahasiswa->nama) . "-absen" . '-' . Carbon::now()->format('YmdHis') . "." . $dokumen->getClientOriginalExtension();
+
+                // Pindahkan file ke lokasi yang diinginkan
                 $dokumen->move($destinationPath, $dokumenUrl);
             }
 

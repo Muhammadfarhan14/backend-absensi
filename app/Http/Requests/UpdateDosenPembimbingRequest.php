@@ -27,7 +27,7 @@ class UpdateDosenPembimbingRequest extends FormRequest
             'nama' => 'required',
             'username' => 'required|unique:users',
             'password' => 'required',
-            'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            // 'gambar' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 
@@ -38,9 +38,9 @@ class UpdateDosenPembimbingRequest extends FormRequest
             'username.required' => 'username tidak boleh kosong',
             'username.unique' => 'username sudah dipakai',
             'password.required' => 'password tidak boleh kosong',
-            'gambar.image' => 'file yang dikirim harus gambar',
-            'gambar.mimes' => 'file gambar harus menggunkan jpg,png,jpeg,gif atau svg',
-            'gambar.max' => 'gambar maksimal 2 mb'
+            // 'gambar.image' => 'file yang dikirim harus gambar',
+            // 'gambar.mimes' => 'file gambar harus menggunkan jpg,png,jpeg,gif atau svg',
+            // 'gambar.max' => 'gambar maksimal 2 mb'
         ];
     }
 }

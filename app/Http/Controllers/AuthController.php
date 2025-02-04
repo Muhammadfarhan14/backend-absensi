@@ -98,8 +98,9 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
-        $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
+        // $pembimbing_lapangan = PembimbingLapangan::where('user_id', $user->id)->first();
         $dosen_pembimbing = DosenPembimbing::where('user_id', $user->id)->first();
+
 
         if ($user->roles == 'mahasiswa') {
             return response()->json([
@@ -112,30 +113,30 @@ class AuthController extends Controller
                     "roles" => $user->roles,
                     "keterangan" => $mahasiswa->keterangan,
                     "dosen_pembimbing" => $mahasiswa->dosen_pembimbing->nama,
-                    "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
+                    // "pembimbing_lapangan" => $mahasiswa->pembimbing_lapangan->nama,
                     "lokasi" => $mahasiswa->lokasi->nama,
                 ],
             ]);
         }
 
-        if ($user->roles == 'pembimbing_lapangan') {
-            $mhs = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
-            Log::debug($mhs);
-            foreach ($mhs as $item) {
-                $item->lokasi;
+        // if ($user->roles == 'pembimbing_lapangan') {
+        //     $mhs = Mahasiswa::where('pembimbing_lapangan_id', $pembimbing_lapangan->id)->get();
+        //     Log::debug($mhs);
+        //     foreach ($mhs as $item) {
+        //         $item->lokasi;
 
-                return response()->json([
-                    "message" => "data user yang login",
-                    "data" => [
-                        "nama_pembimbing_lapangan" => $pembimbing_lapangan->nama,
-                        "keterangan_pembimbing_lapangan" => $pembimbing_lapangan->keterangan,
-                        "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama,
-                        "roles" => $user->roles,
-                        "lokasi" => $item->lokasi
-                    ],
-                ]);
-            }
-        }
+        //         return response()->json([
+        //             "message" => "data user yang login",
+        //             "data" => [
+        //                 "nama_pembimbing_lapangan" => $pembimbing_lapangan->nama,
+        //                 "keterangan_pembimbing_lapangan" => $pembimbing_lapangan->keterangan,
+        //                 "nama_dosen_pembimbing" => $item->dosen_pembimbing->nama,
+        //                 "roles" => $user->roles,
+        //                 "lokasi" => $item->lokasi
+        //             ],
+        //         ]);
+        //     }
+        // }
 
         if ($user->roles == 'dosen_pembimbing') {
             return response()->json([
@@ -148,5 +149,41 @@ class AuthController extends Controller
                 ],
             ]);
         }
+    }
+
+    public function reset_password(Request $request)
+    {
+        if (empty($request->password)) {
+            return response()->json([
+                "message" => "Password tidak boleh kosong"
+            ], 400);
+        }
+
+        $username = $request->username;
+
+        if ($username) {
+            // Cari user berdasarkan username
+            $userSpec = User::where('username', $username)->first();
+
+            // Jika user tidak ditemukan, kembalikan pesan error
+            if (!$userSpec) {
+                return response()->json([
+                    "message" => "Pengguna tidak ditemukan"
+                ], 404);
+            }
+
+            // Update password jika user ditemukan
+            $userSpec->update([
+                'password' => Hash::make($request->password),
+            ]);
+
+            return response()->json([
+                "message" => "Password berhasil diubah",
+            ], 200);
+        }
+
+        return response()->json([
+            "message" => "Pengguna tidak ditemukan"
+        ], 404);
     }
 }

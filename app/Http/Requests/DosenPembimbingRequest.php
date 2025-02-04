@@ -27,7 +27,7 @@ class DosenPembimbingRequest extends FormRequest
             'nama' => 'required',
             'username' => 'required|unique:users',
             'password' => 'required',
-            'gambar' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            // 'gambar' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 

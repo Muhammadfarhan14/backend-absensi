@@ -27,10 +27,9 @@ Route::post('login', [AuthController::class, 'login_app'])->name('login.api');
 Route::get('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('logout.api');
 #end logout
 
-#me
 Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum')->name('me');
-#end me
 
+Route::post('reset-password', [AuthController::class, 'reset_password'])->middleware('auth:sanctum')->name('reset_password');
 
 #mahasiswa
 Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
@@ -53,6 +52,8 @@ Route::middleware('auth:sanctum')->prefix('mahasiswa')->group(function () {
 
     Route::prefix('absen')->group(function () {
         Route::get('get', [MahasiswaController::class, 'get_absen']);
+        Route::get('bulan', [MahasiswaController::class, 'get_absen_bulan']);
+        Route::get('tanggal/{month}/{year}', [MahasiswaController::class, 'get_absen_tanggal']);
         Route::post('create', [MahasiswaController::class, 'absen_action']);
         Route::get('check_absen', [MahasiswaController::class, 'check_absen'])->name('mahasiswa.check_absen');
     });
